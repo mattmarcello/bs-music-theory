@@ -48,9 +48,9 @@ let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
     (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
     ->Belt.List.getExn(keyIndex);
 
-  Js.log2("isPreferredAccidentalSharps", isPreferredAccidentalSharps  );
-  Js.log2("keyIndex", keyIndex );
-  Js.log2("key", key -> Key.toString );
+  Js.log2("isPreferredAccidentalSharps", isPreferredAccidentalSharps);
+  Js.log2("keyIndex", keyIndex);
+  Js.log2("key", key->Key.toString);
 
   {octave, key};
 };
@@ -58,8 +58,39 @@ let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
 let makeWithRawValue = (~rawValue, ()) =>
   makeWithMidiNote(~midiNote=rawValue, ());
 
-let addHalfstep: (t, int) => t = (pitch, halfstep) => {
-  makeWithRawValue(~rawValue=((pitch |> rawValue) + halfstep), ());
+let addHalfstep: (t, int) => t =
+  (pitch, halfstep) => {
+    makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
+  };
+
+let subtractHalfstep: (t, int) => t =
+  (pitch, halfstep) => {
+    makeWithRawValue(~rawValue=(pitch |> rawValue) - halfstep, ());
+  };
+
+let subtractPitch = (t', t'') => {
+  let top = t'->rawValue >= t''->rawValue ? t' : t'';
+  let bottom = t'->rawValue < t''->rawValue ? t' : t'';
+  let diff = top->rawValue - bottom->rawValue;
+
+  let bottomKeyIndex =
+    KeyType.all
+    ->Util.indexOf(bottom.key.type_)
+    ->Belt.Option.getWithDefault(0);
+  let topKeyIndex =
+    KeyType.all->Util.indexOf(top.key.type_)->Belt.Option.getWithDefault(0);
+
+  let degree = Js.Math.abs_int(topKeyIndex - bottomKeyIndex) + 1;
+
+  let isMajor =
+    switch (degree) {
+    | 2
+    | 3
+    | 6
+    | 7 => true
+    | _ => false
+    };
+  ();
 };
 
 /* let addInterval = (pitch: t, interval: Interval.t) => { */
