@@ -21,6 +21,9 @@ let rawValue =
   | Flats(i) => - i
   | Sharps(i) => i;
 
+  /***
+    * TODO: convert to make with variant API
+    */
 let initializeWithInteger = i =>
   switch (i) {
   | 0 => Natural

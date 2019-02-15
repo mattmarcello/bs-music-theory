@@ -4,6 +4,21 @@ type t = {
   semitones: int,
 };
 
+// TODO: remove
+let qualityToString =
+  fun
+  | Interval_Quality.Perfect => "perfect"
+  | Diminished => "diminished"
+  | Minor => "minor"
+  | Major => "major"
+  | Augmented => "augmented"
+
+let toString = ({ quality, degree,  semitones }) => {
+
+	qualityToString(quality) ++ " " ++ string_of_int(degree) ++ " " ++ string_of_int(semitones);
+
+}
+
 let perfect1 = {quality: Perfect, degree: 1, semitones: 0};
 let perfect4 = {quality: Perfect, degree: 4, semitones: 5};
 let perfect5 = {quality: Perfect, degree: 5, semitones: 7};

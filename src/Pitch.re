@@ -9,6 +9,76 @@ let rawValue = ({key, octave}) => {
   semitones + (octave + 1) * 12;
 };
 
+let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
+  let octave = midiNote / 12 - 1;
+  let keyIndex = midiNote mod 12;
+  let key =
+    (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
+    ->Belt.List.getExn(keyIndex);
+
+  {octave, key};
+};
+let makeWithRawValue = (~rawValue, ()) =>
+  makeWithMidiNote(~midiNote=rawValue, ());
+let addHalfstep: (t, int) => t =
+  (pitch, halfstep) => {
+    makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
+  };
+
+let subtractHalfstep: (t, int) => t =
+  (pitch, halfstep) => {
+    makeWithRawValue(~rawValue=(pitch |> rawValue) - halfstep, ());
+  };
+let addInterval = (pitch: t, interval: Interval.t) => {
+  let degree = pitch->subtractHalfstep(1);
+  let targetKeyType = pitch.key.type_->KeyType.atDistance(degree |> rawValue);
+  let targetPitch = pitch->addHalfstep(interval.semitones);
+  let targetOctave =
+    pitch.octave
+    + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
+
+  //convert pitch
+
+  let convertedPitch = {
+    key: Key.makeWithType(~type_=targetKeyType, ()),
+    octave: targetOctave,
+  };
+  let diff = targetPitch->rawValue - convertedPitch->rawValue;
+
+  {
+    ...convertedPitch,
+    key: {
+      ...convertedPitch.key,
+      accidental: Accidental.initializeWithInteger(diff),
+    },
+  };
+};
+
+module ScaleKeys = {
+  module B = Belt;
+
+  let acrossOctaves = (~scale: Scale.t, ~octaves: list(int), ()) => {
+    octaves->B.List.reduce(
+      [],
+      (acc, octave) => {
+        let root: t = {key: scale.key, octave};
+
+        let pitches =
+          scale.type_.intervals
+          ->B.List.map(interval => root->addInterval(interval));
+
+        B.List.concat(acc, pitches);
+      },
+    );
+  };
+
+  let get: Scale.t => list(Key.t) =
+    scale => {
+      acrossOctaves(~scale, ~octaves=[1], ())
+      ->Belt.List.map(pitch => pitch.key);
+    };
+};
+
 let frequency = pitch => {
   Js.Math.pow_float(
     ~base=2.0,
@@ -36,64 +106,73 @@ let nearest = frequency' => {
   results->Belt.List.head->Belt.Option.map(fst);
 };
 
-// this is pretty useless
-let make = (~key, ~octave, ()) => {
-  {key, octave};
-};
+let subtractPitch: (t, t) => Interval.t =
+  (t', t'') => {
+    let top = t'->rawValue >= t''->rawValue ? t' : t'';
+    let bottom = t'->rawValue < t''->rawValue ? t' : t'';
+    let diff = top->rawValue - bottom->rawValue;
 
-let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
-  let octave = midiNote / 12 - 1;
-  let keyIndex = midiNote mod 12;
-  let key =
-    (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
-    ->Belt.List.getExn(keyIndex);
+    let bottomKeyIndex =
+      KeyType.all
+      ->Util.indexOf(bottom.key.type_)
+      ->Belt.Option.getWithDefault(0);
+    let topKeyIndex =
+      KeyType.all
+      ->Util.indexOf(top.key.type_)
+      ->Belt.Option.getWithDefault(0);
 
-  Js.log2("isPreferredAccidentalSharps", isPreferredAccidentalSharps);
-  Js.log2("keyIndex", keyIndex);
-  Js.log2("key", key->Key.toString);
+    let degree = Js.Math.abs_int(topKeyIndex - bottomKeyIndex) + 1;
 
-  {octave, key};
-};
+    let isMajor =
+      switch (degree) {
+      | 2
+      | 3
+      | 6
+      | 7 => true
+      | _ => false
+      };
 
-let makeWithRawValue = (~rawValue, ()) =>
-  makeWithMidiNote(~midiNote=rawValue, ());
+    let majorScale: Scale.t = {type_: ScaleType.major, key: bottom.key};
 
-let addHalfstep: (t, int) => t =
-  (pitch, halfstep) => {
-    makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
+    Js.log2("is major", isMajor);
+
+    Js.log2("major scale keys", majorScale->ScaleKeys.get->Belt.List.map(Key.toString) -> Belt.List.toArray);
+
+    Js.log2("top key", top.key -> Key.toString);
+
+    ScaleKeys.get(majorScale)->Belt.List.has(top.key, (==)) ?
+      {
+        Interval.{quality: isMajor ? Major : Perfect, degree, semitones: diff};
+      } :
+      (
+        if (isMajor) {
+          Js.log("in is major branch");
+
+          let majorPitch =
+            bottom->addInterval(
+              Interval.{quality: Major, degree, semitones: diff},
+            );
+
+          let offset = top->rawValue - majorPitch->rawValue;
+
+          Interval.{
+            quality: offset > 0 ? Augmented : Minor,
+            degree,
+            semitones: diff,
+          };
+        } else {
+          let perfectPitch =
+            bottom->addInterval(
+              Interval.{quality: Perfect, degree, semitones: diff},
+            );
+
+          let offset = top->rawValue - perfectPitch->rawValue;
+
+          Interval.{
+            quality: offset > 0 ? Augmented : Diminished,
+            degree,
+            semitones: diff,
+          };
+        }
+      );
   };
-
-let subtractHalfstep: (t, int) => t =
-  (pitch, halfstep) => {
-    makeWithRawValue(~rawValue=(pitch |> rawValue) - halfstep, ());
-  };
-
-let subtractPitch = (t', t'') => {
-  let top = t'->rawValue >= t''->rawValue ? t' : t'';
-  let bottom = t'->rawValue < t''->rawValue ? t' : t'';
-  let diff = top->rawValue - bottom->rawValue;
-
-  let bottomKeyIndex =
-    KeyType.all
-    ->Util.indexOf(bottom.key.type_)
-    ->Belt.Option.getWithDefault(0);
-  let topKeyIndex =
-    KeyType.all->Util.indexOf(top.key.type_)->Belt.Option.getWithDefault(0);
-
-  let degree = Js.Math.abs_int(topKeyIndex - bottomKeyIndex) + 1;
-
-  let isMajor =
-    switch (degree) {
-    | 2
-    | 3
-    | 6
-    | 7 => true
-    | _ => false
-    };
-  ();
-};
-
-/* let addInterval = (pitch: t, interval: Interval.t) => { */
-/*   let degree = interval.degree - 1; */
-/*   let targetKeyType = */
-/* }; */

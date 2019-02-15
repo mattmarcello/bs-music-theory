@@ -19,6 +19,9 @@ let rawValue =
 
 let all = [C, D, E, F, G, A, B];
 
+/**
+  * TODO: refactor to at(~degree)
+  */
 let atDistance: (t, int) => t =
   (key, distance) => {
     let index = Util.indexOf(all, key)->Belt.Option.getExn;
@@ -42,29 +45,32 @@ let distanceFrom = (key, target) => {
   };
 };
 
-let octaveDiff = (key, interval: Interval.t, octave) => {
-  let diff = ref(0);
-  let currentKey = ref(key);
-  for (_ in 0 to interval.degree - 1) {
-    let next =
-      switch (octave) {
-      | Octave.Higher => key->atDistance(1)
-      | Lower => key->atDistance(-1)
-      };
+//TODO: refactor this API
+let octaveDiff: (t, Interval.t, Octave.t) => int =
+  (key, interval: Interval.t, octave) => {
+    let diff = ref(0);
+    let currentKey = ref(key);
+    for (_ in 0 to interval.degree - 1) {
+      let next =
+        switch (octave) {
+        | Octave.Higher => key->atDistance(1)
+        | Lower => key->atDistance(-1)
+        };
 
-    diff :=
-      (
-        switch ((octave, currentKey^, next)) {
-	 | (Octave.Higher, B, C) => diff^ + 1
-	 | (Octave.Lower, C, B) => diff^ - 1
-	 | _ => diff^
-        }
-      );
+      diff :=
+        (
+          switch (octave, currentKey^, next) {
+          | (Octave.Higher, B, C) => diff^ + 1
+          | (Octave.Lower, C, B) => diff^ - 1
+          | _ => diff^
+          }
+        );
 
-    currentKey := next
+      currentKey := next;
+    };
 
+    diff^;
   };
-};
 
 let toString =
   fun
