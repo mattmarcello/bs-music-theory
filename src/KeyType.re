@@ -7,6 +7,43 @@ type t =
   | A
   | B;
 
+let make =
+  fun
+  | `StringLiteral(str) =>
+    switch (str) {
+    | "c"
+    | "C" => C
+    | "d"
+    | "D" => D
+    | "e"
+    | "E" => E
+    | "f"
+    | "F" => F
+    | "g"
+    | "G" => G
+    | "a"
+    | "A" => A
+    | "b"
+    | "B" => B
+    | _ => assert(false)
+    };
+
+/* let makeWithStringLiteral = str => { */
+/*   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)"); */
+
+/*   switch (str->Js.Re.exec(pattern)) { */
+/*   | Some(match) when match->Js.Re.captures->Belt.Array.length == 3 => */
+/*     let [_, key, accidental] = match->Js.Re.captures->Belt.List.fromArray; */
+
+/*     D; */
+/*   | _ => D */
+/*   }; */
+/* }; */
+
+let make =
+  fun
+  | `StringLiteral(str) => C;
+
 let rawValue =
   fun
   | C => 0

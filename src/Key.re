@@ -3,6 +3,20 @@ type t = {
   accidental: Accidental.t,
 };
 
+
+let makeWithStringLiteral = str => {
+  let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)");
+
+  //TODO: rewrite this to be nicer
+  switch (str->Js.Re.exec(pattern)) {
+  | Some(match) when match->Js.Re.captures->Belt.Array.length == 3 =>
+    let [_, key, accidental] = match->Js.Re.captures->Belt.List.fromArray;
+
+    KeyType.D;
+  | _ => D
+  };
+};
+
 let keysWithSharps = [
   {type_: KeyType.C, accidental: Accidental.natural },
   {type_: C, accidental: Accidental.sharp },

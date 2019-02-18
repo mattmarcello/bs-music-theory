@@ -33,4 +33,10 @@ testAll(
   distanceFrom(key', key'') == distance ? pass : fail("")
 );
 
-Skip.test("octaveDiff")
+test("make with stringLiteral", () => {
+  Expect.(expect(1) |> toBe(2))
+}
+
+);
+
+Skip.test("octaveDiff");

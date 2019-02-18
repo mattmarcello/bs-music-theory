@@ -3,6 +3,8 @@ type t =
   | Flats(int)
   | Sharps(int);
 
+  KeyType.make(`StringLiteral("a"));
+
 let flat = Flats(1);
 let sharp = Sharps(1);
 
