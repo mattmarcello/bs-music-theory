@@ -4,6 +4,10 @@ type t = {
   semitones: int,
 };
 
+
+//TODO: have consistent format for math operators
+
+
 // TODO: remove
 let qualityToString =
   fun
@@ -36,14 +40,14 @@ let minor10 = {quality: Minor, degree: 10, semitones: 15};
 let minor13 = {quality: Minor, degree: 13, semitones: 20};
 let minor14 = {quality: Minor, degree: 14, semitones: 22};
 
-let major2 = {quality: Major, degree: 2, semitones: 1};
-let major3 = {quality: Major, degree: 3, semitones: 3};
-let major6 = {quality: Major, degree: 6, semitones: 8};
-let major7 = {quality: Major, degree: 7, semitones: 10};
-let major9 = {quality: Major, degree: 9, semitones: 13};
-let major10 = {quality: Major, degree: 10, semitones: 15};
-let major13 = {quality: Major, degree: 13, semitones: 20};
-let major14 = {quality: Major, degree: 14, semitones: 22};
+let major2 = {quality: Major, degree: 2, semitones: 2};
+let major3 = {quality: Major, degree: 3, semitones: 4};
+let major6 = {quality: Major, degree: 6, semitones: 9};
+let major7 = {quality: Major, degree: 7, semitones: 11};
+let major9 = {quality: Major, degree: 9, semitones: 14};
+let major10 = {quality: Major, degree: 10, semitones: 16};
+let major13 = {quality: Major, degree: 13, semitones: 21};
+let major14 = {quality: Major, degree: 14, semitones: 23};
 
 let diminished1 = {quality: Diminished, degree: 1, semitones: (-1)};
 let diminished2 = {quality: Diminished, degree: 2, semitones: 0};

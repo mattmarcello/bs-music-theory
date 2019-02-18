@@ -55,17 +55,18 @@ describe("pitch", () => {
 
     Expect.(expect(pitch') |> toEqual(pitch''));
   });
+
   test("subtractPitch", () => {
+
     let c1 = Pitch.{key: Key.makeWithType(~type_=C, ()), octave: 1};
+
     let d1  = Pitch.{key: Key.makeWithType(~type_=D, ()), octave: 1};
 
     let actual = d1->Pitch.subtractPitch(c1);
 
     let expected = Interval.major2;
 
-    Js.log2("actual", Interval.toString(actual));
-    Js.log2("expected", Interval.toString(expected));
-
     Expect.(expect(actual) |> toEqual(expected));
   });
 });
+
