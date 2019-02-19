@@ -23,8 +23,14 @@ let makeWithStringLiteral = str => {
   };
 };
 
+let makeWithType = (~type_, ~accidental=Accidental.Natural, ()) => {
+  type_,
+  accidental,
+};
+
 let make =
   fun
+  | `Type(type_) => makeWithType(~type_=type_, ())
   | `StringLiteral(str) => makeWithStringLiteral(str);
 
 let keysWithSharps = [
@@ -75,10 +81,6 @@ let equal = (k', k'') => {
 
 /* end math and equality operators */
 
-let makeWithType = (~type_, ~accidental=Accidental.Natural, ()) => {
-  type_,
-  accidental,
-};
 
 let toString = ({type_, accidental}) => {
   KeyType.toString(type_) ++ " " ++ Accidental.toString(accidental);

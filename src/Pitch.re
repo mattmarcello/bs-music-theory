@@ -31,9 +31,44 @@ let addHalfstep: (t, int) => t =
     makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
   };
 
+let make =
+  fun
+  | `IntegerLiteral(i)
+  | `RawValue(i) => makeWithRawValue(~rawValue=i, ())
+  | `MidiNote(mn) => makeWithMidiNote(~midiNote=mn, ());
+
+//* TODO: organize math operators */
+
 let subtractHalfstep: (t, int) => t =
   (pitch, halfstep) => {
     makeWithRawValue(~rawValue=(pitch |> rawValue) - halfstep, ());
+  };
+
+let subtractInterval: (t, Interval.t) => t =
+  (pitch, interval) => {
+    let degree = - (interval.degree - 1);
+    let targetKeyType = pitch.key.type_->KeyType.atDistance(degree);
+    let targetPitch = pitch->subtractHalfstep(interval.semitones);
+
+    let targetOctave =
+      pitch.octave
+      + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
+
+    // convert pitch 
+
+    let convertedPitch = {key: Key.make(`Type(targetKeyType)), octave: targetOctave };
+    let diff = targetPitch -> rawValue - convertedPitch -> rawValue;
+
+    {
+	    ...convertedPitch,
+    
+	    key: {
+		    ...convertedPitch.key,
+		    accidental: Accidental.make(`IntegerLiteral(diff))
+	    }
+    }
+
+
   };
 
 let addInterval = (pitch: t, interval: Interval.t) => {
@@ -44,14 +79,12 @@ let addInterval = (pitch: t, interval: Interval.t) => {
     pitch.octave
     + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
 
-
   //convert pitch
 
   let convertedPitch = {
     key: Key.makeWithType(~type_=targetKeyType, ()),
     octave: targetOctave,
   };
-
 
   let diff = targetPitch->rawValue - convertedPitch->rawValue;
 
@@ -64,6 +97,8 @@ let addInterval = (pitch: t, interval: Interval.t) => {
   };
 };
 
+let equal = (p', p'') => p'->rawValue == p''->rawValue;
+
 module ScaleKeys = {
   module B = Belt;
 
@@ -72,9 +107,6 @@ module ScaleKeys = {
       [],
       (acc, octave) => {
         let root: t = {key: scale.key, octave};
-
-
-
 
         let pitches =
           scale.type_.intervals
