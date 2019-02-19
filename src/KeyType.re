@@ -9,7 +9,9 @@ type t =
 
 let make =
   fun
-  | `StringLiteral(str) =>
+  | `StringLiteral(str) => {
+
+
     switch (str) {
     | "c"
     | "C" => C
@@ -28,6 +30,8 @@ let make =
     | _ => assert(false)
     };
 
+	  }
+
 let ofString =  str => make(`StringLiteral(str))
 
 /* let makeWithStringLiteral = str => { */
@@ -42,9 +46,6 @@ let ofString =  str => make(`StringLiteral(str))
 /*   }; */
 /* }; */
 
-let make =
-  fun
-  | `StringLiteral(str) => C;
 
 let rawValue =
   fun

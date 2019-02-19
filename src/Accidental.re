@@ -17,10 +17,6 @@ let makeWithStringLiteral = str => {
   ->Belt.Array.reduce(
       0,
       (acc, curr) => {
-        Js.log2("acc", acc);
-
-        Js.log2("curr", curr);
-
         switch (curr) {
         | "#" => acc + 1 
         /*

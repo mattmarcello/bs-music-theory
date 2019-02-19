@@ -26,16 +26,55 @@ let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
 };
 let makeWithRawValue = (~rawValue, ()) =>
   makeWithMidiNote(~midiNote=rawValue, ());
+
 let addHalfstep: (t, int) => t =
   (pitch, halfstep) => {
     makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
   };
 
+let makeWithStringLiteral = str => {
+  let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)(-?)(\\d+)");
+
+  switch (
+    str
+    ->Js.Re.exec(pattern)
+    ->Belt.Option.map(Js.Re.captures)
+    ->Belt.Option.map(Belt.List.fromArray)
+    ->Belt.Option.map(l => l->Belt.List.map(Js.Nullable.toOption))
+  ) {
+  | Some([
+      _,
+      Some(keyTypeString),
+      Some(accidentalString),
+      Some(signString),
+      Some(octaveString),
+    ]) =>
+
+    let keyType = KeyType.make(`StringLiteral(keyTypeString));
+
+    let accidental = Accidental.make(`StringLiteral(accidentalString));
+
+    let octave = int_of_string(octaveString) * (signString == "-" ? (-1) : 1);
+
+    {
+      key: {
+        type_: keyType,
+        accidental,
+      },
+      octave,
+    };
+
+  | _ =>
+    {key: Key.make(`StringLiteral("C")), octave: 0};
+  };
+};
+
 let make =
   fun
   | `IntegerLiteral(i)
   | `RawValue(i) => makeWithRawValue(~rawValue=i, ())
-  | `MidiNote(mn) => makeWithMidiNote(~midiNote=mn, ());
+  | `MidiNote(midiNote) => makeWithMidiNote(~midiNote, ())
+  | `StringLiteral(s) => makeWithStringLiteral(s);
 
 //* TODO: organize math operators */
 
@@ -54,21 +93,22 @@ let subtractInterval: (t, Interval.t) => t =
       pitch.octave
       + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
 
-    // convert pitch 
+    // convert pitch
 
-    let convertedPitch = {key: Key.make(`Type(targetKeyType)), octave: targetOctave };
-    let diff = targetPitch -> rawValue - convertedPitch -> rawValue;
+    let convertedPitch = {
+      key: Key.make(`Type(targetKeyType)),
+      octave: targetOctave,
+    };
+    let diff = targetPitch->rawValue - convertedPitch->rawValue;
 
     {
-	    ...convertedPitch,
-    
-	    key: {
-		    ...convertedPitch.key,
-		    accidental: Accidental.make(`IntegerLiteral(diff))
-	    }
-    }
+      ...convertedPitch,
 
-
+      key: {
+        ...convertedPitch.key,
+        accidental: Accidental.make(`IntegerLiteral(diff)),
+      },
+    };
   };
 
 let addInterval = (pitch: t, interval: Interval.t) => {

@@ -90,6 +90,26 @@ testAll(
       d1->Pitch.subtractInterval(Interval.minor2)->Pitch.equal(csharp1) ?
         pass : fail("");
     },
+    {
+      let d1 = Pitch.{key: Key.make(`Type(KeyType.D)), octave: 1};
+
+      let c1 = Pitch.{key: Key.make(`StringLiteral("C")), octave: 1};
+
+      d1->Pitch.subtractInterval(Interval.major2)->Pitch.equal(c1) ?
+        pass : fail("");
+    },
+    {
+      let p = Pitch.make(`StringLiteral("f#-5"));
+
+      let fsharp = Key.make(`StringLiteral("f#"));
+
+      Expect.(expect(p.key) |> toEqual(fsharp));
+    },
+    {
+      let p = Pitch.make(`StringLiteral("f#-5"));
+
+      Expect.(expect(p.octave) |> toEqual(-5));
+    },
   ],
   assertion =>
   assertion
