@@ -28,6 +28,8 @@ let make =
     | _ => assert(false)
     };
 
+let ofString =  str => make(`StringLiteral(str))
+
 /* let makeWithStringLiteral = str => { */
 /*   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)"); */
 

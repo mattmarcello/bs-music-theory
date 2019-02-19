@@ -3,7 +3,50 @@ type t =
   | Flats(int)
   | Sharps(int);
 
-  KeyType.make(`StringLiteral("a"));
+let makeWithInteger = i =>
+  if (i == 0) {
+    Natural;
+  } else if (i > 0) {
+    Sharps(i);
+  } else {
+    Flats(Js.Math.abs_int(i));
+  };
+
+let makeWithStringLiteral = str => {
+  Js.String.split("", str)
+  ->Belt.Array.reduce(
+      0,
+      (acc, curr) => {
+        Js.log2("acc", acc);
+
+        Js.log2("curr", curr);
+
+        switch (curr) {
+        | "#" => acc + 1 
+        /*
+            Can't pattern match on unicode
+
+         | {"♯"} => acc + 1 */
+        | "b" => acc - 1
+
+	/*
+
+        | "♭" => acc - 1
+	*/
+        | _ => acc 
+        };
+      },
+    )
+  |> makeWithInteger;
+};
+
+let make =
+  fun
+  | `RawValue(i)
+  | `IntegerLiteral(i) => makeWithInteger(i)
+  | `StringLiteral(s) => makeWithStringLiteral(s);
+
+let ofString = str => make(`StringLiteral(str));
 
 let flat = Flats(1);
 let sharp = Sharps(1);
@@ -23,9 +66,9 @@ let rawValue =
   | Flats(i) => - i
   | Sharps(i) => i;
 
-  /***
-    * TODO: convert to make with variant API
-    */
+/***
+ * TODO: convert to make with variant API
+ */
 let initializeWithInteger = i =>
   switch (i) {
   | 0 => Natural
