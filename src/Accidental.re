@@ -14,24 +14,21 @@ let makeWithInteger = i =>
 
 let makeWithStringLiteral = str => {
   Js.String.split("", str)
-  ->Belt.Array.reduce(
-      0,
-      (acc, curr) => {
-        switch (curr) {
-        | "#" => acc + 1 
-        /*
-            Can't pattern match on unicode
+  ->Belt.Array.reduce(0, (acc, curr) =>
+      switch (curr) {
+      | "#" => acc + 1
+      /*
+          Can't pattern match on unicode
 
-         | {"♯"} => acc + 1 */
-        | "b" => acc - 1
+       | {"♯"} => acc + 1 */
+      | "b" => acc - 1
 
-	/*
+      /*
 
-        | "♭" => acc - 1
-	*/
-        | _ => acc 
-        };
-      },
+              | "♭" => acc - 1
+       */
+      | _ => acc
+      }
     )
   |> makeWithInteger;
 };
@@ -85,4 +82,14 @@ let multiplyInt = (a, i) => initializeWithInteger(a->rawValue * i);
 
 let divideInt = (a, i) => initializeWithInteger(a->rawValue / i);
 
-let toString = a => a->rawValue->string_of_int;
+//* TODO: doesn't support double sharp / double flat notation */
+
+let toString =
+  fun
+  | Natural => ""
+  | Flats(amount) => Js.String.repeat(amount, "b")
+  | Sharps(amount) => Js.String.repeat(amount, "#");
+
+
+
+

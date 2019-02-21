@@ -49,7 +49,6 @@ let makeWithStringLiteral = str => {
       Some(signString),
       Some(octaveString),
     ]) =>
-
     let keyType = KeyType.make(`StringLiteral(keyTypeString));
 
     let accidental = Accidental.make(`StringLiteral(accidentalString));
@@ -64,8 +63,7 @@ let makeWithStringLiteral = str => {
       octave,
     };
 
-  | _ =>
-    {key: Key.make(`StringLiteral("C")), octave: 0};
+  | _ => {key: Key.make(`StringLiteral("C")), octave: 0}
   };
 };
 
@@ -169,10 +167,14 @@ module ScaleKeys = {
 };
 
 let frequency = pitch => {
+
+  Js.log2("pitch raw value", pitch -> rawValue);
+
   Js.Math.pow_float(
-    ~base=2.0,
-    ~exp=(rawValue(pitch) - 69 / 12) * 440 |> float_of_int,
-  );
+    ~base=2.,
+    ~exp=(float_of_int(rawValue(pitch)) -. 69.) /. 12.,
+  )
+  *. 440.;
 };
 
 let nearest = frequency' => {
@@ -184,15 +186,32 @@ let nearest = frequency' => {
       )
     ->Belt.List.flatten;
 
+  allPitches->Belt.List.map(frequency)->Belt.List.toArray->Js.log;
+
   let results =
     allPitches->Belt.List.map(pitch =>
       (pitch, Js.Math.abs_float(pitch->frequency -. frequency'))
     );
 
-  results->Belt.List.sort(((_, d'), (_, d'')) => d' -. d'' |> int_of_float)
-  |> ignore;
+  Js.log2(
+    "results",
+    results
+    ->Belt.List.toArray
+    ->Belt.Array.map(thing => (thing->fst->toString, thing->snd)),
+  );
 
-  results->Belt.List.head->Belt.Option.map(fst);
+  let sorted =
+    results->Belt.List.sort(((_, d'), (_, d'')) =>
+      d' -. d'' |> int_of_float
+    );
+
+  Js.log2(
+    "sorted",
+    sorted
+    ->Belt.List.toArray
+    ->Belt.Array.map(thing => (thing->fst->toString, thing->snd)),
+  );
+  sorted->Belt.List.head->Belt.Option.map(fst);
 };
 
 let subtractPitch: (t, t) => Interval.t =

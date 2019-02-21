@@ -114,3 +114,49 @@ testAll(
   assertion =>
   assertion
 );
+
+testAll(
+  "frequency",
+  [
+    {
+      let note = Pitch.{key: Key.make(`Type(KeyType.A)), octave: 4};
+      Expect.(expect(note->Pitch.frequency) |> toEqual(440.0));
+    },
+    {
+      let note = Pitch.{key: Key.make(`Type(KeyType.A)), octave: 4};
+      let a4 = Pitch.nearest(440.0);
+
+      Js.log2("a4", a4->Belt.Option.map(Pitch.toString));
+
+      Expect.(expect(a4) |> toEqual(Some(note)));
+    },
+  ],
+  assertion =>
+  assertion
+);
+
+testAll(
+  "note value conversison",
+  [
+    {
+      let noteValue = NoteValue.{type_: Half, modifier: Dotted};
+
+      let actual = noteValue->NoteValue.div(Sixteenth);
+
+      let expected = 12.0;
+
+      Expect.(expect(actual) |> toBe(expected));
+    },
+    {
+      let noteValue = NoteValue.{type_: Half, modifier: Dotted};
+
+      let actual = noteValue->NoteValue.div(Whole);
+
+      let expected = 0.75;
+
+      Expect.(expect(actual) |> toBe(expected));
+    },
+  ],
+  assertion =>
+  assertion
+);
