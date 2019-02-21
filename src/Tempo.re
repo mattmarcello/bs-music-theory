@@ -3,6 +3,8 @@ type t = {
   bpm: float,
 };
 
+let default = {timeSignature: TimeSignature.default, bpm: 120.};
+
 //TODO: make sure consistent convention look at call site
 
 let duration = (tempo, ~of_ as noteValue: NoteValue.t, ()) => {
@@ -13,7 +15,7 @@ let duration = (tempo, ~of_ as noteValue: NoteValue.t, ()) => {
   *. noteValue.modifier->NoteModifier.rawValue;
 };
 
-let sampleRate =
+let sampleLength =
     (tempo, ~of_ as noteValue: NoteValue.t, ~sampleRate=44100., ()) => {
   let secondsPerBeat = 60.0 /. tempo.bpm;
   secondsPerBeat
@@ -26,4 +28,4 @@ let hertz = (tempo, ~of_ as noteValue: NoteValue.t, ()) => {
   1. /. tempo->duration(~of_=noteValue, ());
 };
 
-let description = t => t.bpm -> string_of_float;
+let description = t => t.bpm->string_of_float;

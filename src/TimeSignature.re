@@ -15,6 +15,8 @@ let make =
   fun
   | `BeatsAndDivision(b, d) => makeWithBeatsAndDivision(b, d);
 
+let default = { beats: 4, noteValue: Quarter }
+
 let description = ts =>
   ts.beats->string_of_int
   ++ "/"

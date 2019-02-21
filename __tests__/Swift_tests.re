@@ -164,35 +164,78 @@ testAll(
 testAll(
   "durations",
   [
+    {
+      let timeSignature = TimeSignature.{beats: 4, noteValue: Quarter};
 
+      let tempo = Tempo.{timeSignature, bpm: 120.};
 
-  {
-    let timeSignature = TimeSignature.{ beats: 4, noteValue: Quarter }
+      let noteValue = NoteValue.make(`Type(NoteValueType.Quarter));
 
-    let tempo =  Tempo.{ timeSignature, bpm: 120. };
+      let duration = tempo->Tempo.duration(~of_=noteValue, ());
 
-    let noteValue = NoteValue.make(`Type(NoteValueType.Quarter));
+      Expect.(expect(duration) |> toEqual(0.5));
+    },
+    {
+      let timeSignature = TimeSignature.{beats: 4, noteValue: Quarter};
 
-    let duration = tempo -> Tempo.duration(~of_=noteValue,());
+      let tempo = Tempo.{timeSignature, bpm: 120.};
 
+      let noteValue =
+        NoteValue.{type_: NoteValueType.Quarter, modifier: Dotted};
 
-    Expect.(expect(duration) |> toEqual(0.5))
+      let duration = tempo->Tempo.duration(~of_=noteValue, ());
 
-  },
-
-  {
-    let timeSignature = TimeSignature.{ beats: 4, noteValue: Quarter }
-
-    let tempo =  Tempo.{ timeSignature, bpm: 120. };
-
-    let noteValue = NoteValue.{ type_: NoteValueType.Quarter,  modifier: Dotted }
-
-    let duration = tempo -> Tempo.duration(~of_=noteValue,());
-
-    Expect.(expect(duration) |> toEqual(0.75))
-
-  },
+      Expect.(expect(duration) |> toEqual(0.75));
+    },
   ],
   assertion =>
   assertion
-)
+);
+
+test("sample length calculations", () => {
+  let rates = [
+    NoteValue.{type_: Whole, modifier: Default},
+    NoteValue.{type_: Half, modifier: Default},
+    NoteValue.{type_: Half, modifier: Dotted},
+    NoteValue.{type_: Half, modifier: Triplet},
+    NoteValue.{type_: Quarter, modifier: Default},
+    NoteValue.{type_: Quarter, modifier: Dotted},
+    NoteValue.{type_: Quarter, modifier: Triplet},
+    NoteValue.{type_: Eighth, modifier: Default},
+    NoteValue.{type_: Eighth, modifier: Dotted},
+    NoteValue.{type_: Sixteenth, modifier: Default},
+    NoteValue.{type_: Sixteenth, modifier: Dotted},
+    NoteValue.{type_: Thirtysecond, modifier: Default},
+    NoteValue.{type_: Sixtyfourth, modifier: Default},
+  ];
+
+  let tempo = Tempo.default;
+
+  let round = f =>
+    f -. Js.Math.floor_float(f) >= 0.5 ?
+      Js.Math.ceil_float(f) : Js.Math.floor_float(f);
+
+  let actual =
+    rates
+    ->Belt.List.map(rate => tempo->Tempo.sampleLength(~of_=rate, ()))
+    ->Belt.List.map(sampleLength => round(100. *. sampleLength) /. 100.);
+
+  let expected = [
+    88200.0,
+    44100.0,
+    66150.0,
+    29401.47,
+    22050.0,
+    33075.0,
+    14700.73,
+    11025.0,
+    16537.5,
+    5512.5,
+    8268.75,
+    2756.25,
+    1378.13,
+  ];
+
+  Expect.(expect(actual) |> toEqual(expected))
+
+});
