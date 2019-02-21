@@ -1,4 +1,4 @@
-type t = 
+type t =
   | DoubleWhole
   | Whole
   | Half
@@ -6,10 +6,10 @@ type t =
   | Eighth
   | Sixteenth
   | Thirtysecond
-  | Sixtyfourth
+  | Sixtyfourth;
 
-
-  let rawValue = fun
+let rawValue =
+  fun
   | DoubleWhole => 0.5
   | Whole => 1.
   | Half => 2.
@@ -17,4 +17,20 @@ type t =
   | Eighth => 8.
   | Sixteenth => 16.
   | Thirtysecond => 32.
-  | Sixtyfourth => 64.
+  | Sixtyfourth => 64.;
+
+
+let makeWithFloatLiteral = fun 
+  | 0.5 => Some(DoubleWhole)
+  | 1. => Some(Whole)
+  | 2. => Some(Half)
+  | 4. => Some(Quarter)
+  | 8. => Some(Eighth)
+  | 16. => Some(Sixteenth)
+  | 32. => Some(Thirtysecond)
+  | 64. => Some(Sixtyfourth)
+  | _ => None
+
+
+let make =  fun 
+  | `FloatLiteral(f) => makeWithFloatLiteral(f)

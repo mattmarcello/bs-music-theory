@@ -160,3 +160,39 @@ testAll(
   assertion =>
   assertion
 );
+
+testAll(
+  "durations",
+  [
+
+
+  {
+    let timeSignature = TimeSignature.{ beats: 4, noteValue: Quarter }
+
+    let tempo =  Tempo.{ timeSignature, bpm: 120. };
+
+    let noteValue = NoteValue.make(`Type(NoteValueType.Quarter));
+
+    let duration = tempo -> Tempo.duration(~of_=noteValue,());
+
+
+    Expect.(expect(duration) |> toEqual(0.5))
+
+  },
+
+  {
+    let timeSignature = TimeSignature.{ beats: 4, noteValue: Quarter }
+
+    let tempo =  Tempo.{ timeSignature, bpm: 120. };
+
+    let noteValue = NoteValue.{ type_: NoteValueType.Quarter,  modifier: Dotted }
+
+    let duration = tempo -> Tempo.duration(~of_=noteValue,());
+
+    Expect.(expect(duration) |> toEqual(0.75))
+
+  },
+  ],
+  assertion =>
+  assertion
+)
