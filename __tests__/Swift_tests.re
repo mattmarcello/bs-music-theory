@@ -236,6 +236,46 @@ test("sample length calculations", () => {
     1378.13,
   ];
 
-  Expect.(expect(actual) |> toEqual(expected))
-
+  Expect.(expect(actual) |> toEqual(expected));
 });
+
+testAll(
+  "scales",
+  [
+    {
+      let cMaj = [
+        Key.make(`Type(KeyType.C)),
+        Key.make(`Type(KeyType.D)),
+        Key.make(`Type(KeyType.E)),
+        Key.make(`Type(KeyType.F)),
+        Key.make(`Type(KeyType.G)),
+        Key.make(`Type(KeyType.A)),
+        Key.make(`Type(KeyType.B)),
+      ];
+
+      let cMajScale =
+        Scale.{type_: ScaleType.major, key: Key.make(`Type(KeyType.C))};
+
+      Expect.(expect(cMajScale |> Pitch.ScaleKeys.get) |> toEqual(cMaj));
+    },
+
+    {
+      let cMin = [
+        Key.make(`Type(KeyType.C)),
+        Key.make(`Type(KeyType.D)),
+        Key.make(`StringLiteral("Eb")),
+        Key.make(`Type(KeyType.F)),
+        Key.make(`Type(KeyType.G)),
+        Key.make(`StringLiteral("Ab")),
+        Key.make(`StringLiteral("Bb")),
+      ];
+
+      let cMinScale =
+        Scale.{type_: ScaleType.minor, key: Key.make(`Type(KeyType.C))};
+
+      Expect.(expect(cMinScale |> Pitch.ScaleKeys.get) |> toEqual(cMin));
+    },
+  ],
+  assertion =>
+  assertion
+);

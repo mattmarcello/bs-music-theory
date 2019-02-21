@@ -137,6 +137,7 @@ let addInterval = (pitch: t, interval: Interval.t) => {
 
 let equal = (p', p'') => p'->rawValue == p''->rawValue;
 
+//*TODO: should i move this? */
 module ScaleKeys = {
   module B = Belt;
 
