@@ -259,9 +259,11 @@ let harmonicField =
     );
 
     switch (ChordTypeT.makeWithIntervals(intervals)) {
-    | None =>
-      /* Js.log("not able to make courd with intevals") */
-      ()
+    | None => {
+
+      Js.log("not able to make courd with intevals");
+      ();
+	    }
     | Some(chord) =>
       chords :=
         Belt.List.concat(

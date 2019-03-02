@@ -6,9 +6,9 @@ module ChordThirdType = {
   let makeWithInterval: Interval.t => option(t) =
     interval => {
       Interval.(
-        switch (interval) {
-        | {quality: Major, degree: 3, semitones: 4} => Some(Major)
-        | {quality: Minor, degree: 3, semitones: 3} => Some(Minor)
+        switch (interval.semitones) {
+        | 4 => Some(Major)
+        | 3 => Some(Minor)
         | _ => None
         }
       );
@@ -45,10 +45,10 @@ module ChordFifthType = {
   let makeWithInterval: Interval.t => option(t) =
     interval => {
       Interval.(
-        switch (interval) {
-        | {quality: Perfect, degree: 5, semitones: 7} => Some(Perfect)
-        | {quality: Diminished, degree: 5, semitones: 6} => Some(Diminished)
-        | {quality: Augmented, degree: 5, semitones: 8} => Some(Augmented)
+        switch (interval.semitones) {
+        | 7 => Some(Perfect)
+        | 6 => Some(Diminished)
+        | 8 => Some(Augmented)
         | _ => None
         }
       );
@@ -86,8 +86,8 @@ module ChordSixthType = {
   let makeWithInterval: Interval.t => option(t) =
     interval => {
       Interval.(
-        switch (interval) {
-        | {quality: Major, degree: 6, semitones: 9} => Some(Sixth)
+        switch (interval.semitones) {
+        | 9 => Some(Sixth)
         | _ => None
         }
       );
@@ -119,10 +119,10 @@ module ChordSeventhType = {
   let makeWithInterval: Interval.t => option(t) =
     interval => {
       Interval.(
-        switch (interval) {
-        | {quality: Major, degree: 7, semitones: 11} => Some(Major)
-        | {quality: Minor, degree: 7, semitones: 10} => Some(Dominant)
-        | {quality: Diminished, degree: 7, semitones: 9} => Some(Diminished)
+        switch (interval.semitones) {
+        | 11 => Some(Major)
+        | 10 => Some(Dominant)
+        | 9 => Some(Diminished)
         | _ => None
         }
       );
@@ -161,9 +161,9 @@ module ChordSuspendedType = {
   let makeWithInterval: Interval.t => option(t) =
     interval => {
       Interval.(
-        switch (interval) {
-        | {quality: Major, degree: 2, semitones: 2} => Some(Sus2)
-        | {quality: Perfect, degree: 4, semitones: 5} => Some(Sus4)
+        switch (interval.semitones) {
+        | 2 => Some(Sus2)
+        | 5 => Some(Sus4)
         | _ => None
         }
       );
@@ -333,194 +333,187 @@ module ChordExtensionType = {
 
 /* TODO: Math operators on Chord type */
 
-  type t = {
-    third: ChordThirdType.t,
-    fifth: ChordFifthType.t,
-    sixth: option(ChordSixthType.t),
-    seventh: option(ChordSeventhType.t),
-    suspended: option(ChordSuspendedType.t),
-    extensions: option(list(ChordExtensionType.t)),
+type t = {
+  third: ChordThirdType.t,
+  fifth: ChordFifthType.t,
+  sixth: option(ChordSixthType.t),
+  seventh: option(ChordSeventhType.t),
+  suspended: option(ChordSuspendedType.t),
+  extensions: option(list(ChordExtensionType.t)),
+};
+
+let makeWithIntervals: list(Interval.t) => option(t) =
+  intervals => {
+    let third = ref(None) 
+    let fifth = ref(None);
+    let sixth = ref(None);
+    let seventh = ref(None);
+    let suspended = ref(None);
+    let extensions = ref(None);
+
+    intervals->Belt.List.forEach(interval => {
+      let maybeThird = ChordThirdType.make(`Interval(interval));
+      if (maybeThird->Belt.Option.isSome) {
+        third := maybeThird;
+      };
+
+      let maybeFifth = ChordFifthType.make(`Interval(interval));
+      if (maybeFifth->Belt.Option.isSome) {
+        fifth := maybeFifth;
+      };
+
+      let maybeSixth = ChordSixthType.make(`Interval(interval));
+      if (maybeSixth->Belt.Option.isSome) {
+        sixth := maybeSixth;
+      };
+
+      let maybeSeventh = ChordSeventhType.make(`Interval(interval));
+      if (maybeSeventh->Belt.Option.isSome) {
+        seventh := maybeSeventh;
+      };
+
+      let maybeSuspended = ChordSuspendedType.make(`Interval(interval));
+      if (maybeSuspended->Belt.Option.isSome) {
+        suspended := maybeSuspended;
+      };
+
+      let maybeExtension = ChordExtensionType.make(~interval, ());
+
+      if (maybeExtension->Belt.Option.isSome) {
+        switch (extensions^) {
+        | Some(extensions') =>
+          extensions :=
+            Some(
+              Belt.List.concat(
+                extensions',
+                [maybeExtension->Belt.Option.getExn],
+              ),
+            )
+        | None => extensions := Some([maybeExtension->Belt.Option.getExn])
+        };
+      };
+    });
+
+    // return None if third and fifth intervals are not supplied
+    switch (third^, fifth^) {
+    | (Some(third), Some(fifth)) =>
+      Some({
+        third,
+        fifth,
+        sixth: sixth^,
+        seventh: seventh^,
+        suspended: suspended^,
+        extensions: extensions^,
+      })
+
+    | _ =>
+      Js.log((third^)->Belt.Option.isNone ? "no third" : "there is a third");
+      Js.log((fifth^)->Belt.Option.isNone ? "no fifth" : "there is a fifth");
+
+      None;
+    };
   };
 
-  let makeWithIntervals: list(Interval.t) => option(t) =
-    intervals => {
-      let third = ref(None);
-      let fifth = ref(None);
-      let sixth = ref(None);
-      let seventh = ref(None);
-      let suspended = ref(None);
-      let extensions = ref(None);
+let make =
+    (
+      ~third: ChordThirdType.t,
+      ~fifth: ChordFifthType.t=ChordFifthType.Perfect,
+      ~sixth: option(ChordSixthType.t)=?,
+      ~seventh: option(ChordSeventhType.t)=?,
+      ~suspended: option(ChordSuspendedType.t)=?,
+      ~extensions: option(list(ChordExtensionType.t))=?,
+      (),
+    ) => {
+  {third, fifth, sixth, seventh, suspended, extensions};
+};
 
-      intervals->Belt.List.forEach(interval => {
-        let maybeThird = ChordThirdType.make(`Interval(interval));
-        if (maybeThird->Belt.Option.isSome) {
-          third := maybeThird;
+let intervals = t => {
+  [
+    t.sixth->Belt.Option.isNone ?
+      Some(t.third->ChordThirdType.interval) : None,
+    t.suspended->Belt.Option.map(ChordSuspendedType.interval),
+    Some(t.fifth->ChordFifthType.interval),
+    t.sixth->Belt.Option.map(ChordSixthType.interval),
+    t.seventh->Belt.Option.map(ChordSeventhType.interval),
+  ]
+  ->Belt.List.concat(
+      {
+        switch (t.extensions) {
+        | Some((extensions: list(ChordExtensionType.t))) =>
+          extensions
+          ->Belt.List.sort((a, b) =>
+              a.type_->ChordExtensionType.ExtensionType.rawValue
+              - b.type_->ChordExtensionType.ExtensionType.rawValue
+            )
+          ->Belt.List.map(ChordExtensionType.interval)
+          ->Belt.List.map(interval => Some(interval))
+        | None => []
         };
+      },
+    )
+  ->Belt.List.keepMap(Util.identity);
+};
 
-        let maybeFifth = ChordFifthType.make(`Interval(interval));
-        if (maybeFifth->Belt.Option.isSome) {
-          fifth := maybeFifth;
-        };
+let notation = ({third, fifth, sixth, seventh, suspended, extensions}) => {
+  let seventhNotation =
+    ref(seventh->Belt.Option.mapWithDefault("", ChordSeventhType.notation));
 
-        let maybeSixth = ChordSixthType.make(`Interval(interval));
-        if (maybeSixth->Belt.Option.isSome) {
-          sixth := maybeSixth;
-        };
+  let sixthNotation =
+    ref(
+      sixth->Belt.Option.mapWithDefault("", ChordSixthType.notation)
+      ++ (seventh->Belt.Option.isSome ? "/" : ""),
+    );
 
-        let maybeSeventh = ChordSeventhType.make(`Interval(interval));
-        if (maybeSeventh->Belt.Option.isSome) {
-          seventh := maybeSeventh;
-        };
+  let suspendedNotation =
+    suspended->Belt.Option.mapWithDefault("", ChordSuspendedType.notation);
 
-        let maybeSuspended = ChordSuspendedType.make(`Interval(interval));
-        if (maybeSuspended->Belt.Option.isSome) {
-          suspended := maybeSuspended;
-        };
+  let extensionNotation = {
+    let ext =
+      extensions->Belt.Option.mapWithDefault([], extensions =>
+        extensions->Belt.List.sort((a, b) =>
+          a.type_->ChordExtensionType.ExtensionType.rawValue
+          - b.type_->ChordExtensionType.ExtensionType.rawValue
+        )
+      );
 
-        let maybeExtension = ChordExtensionType.make(~interval, ());
+    let singleNotation = ref(ext->Belt.List.length > 0);
 
-        if (maybeExtension->Belt.Option.isSome) {
-          switch (extensions^) {
-          | Some(extensions') =>
-            extensions :=
-              Some(
-                Belt.List.concat(
-                  extensions',
-                  [maybeExtension->Belt.Option.getExn],
-                ),
-              )
-          | None => extensions := Some([maybeExtension->Belt.Option.getExn])
-          };
-        };
-      });
-
-      // return None if third and fifth intervals are not supplied
-      switch (third^, fifth^) {
-      | (Some(third), Some(fifth)) =>
-        Some({
-          third,
-          fifth,
-          sixth: sixth^,
-          seventh: seventh^,
-          suspended: suspended^,
-          extensions: extensions^,
-        })
-
-      | _ => None
+    for (i in 0 to ext->Belt.List.length - 1) {
+      if (ext->Belt.List.getExn(i).accidental != Accidental.natural) {
+        singleNotation := false;
       };
     };
 
-  let make =
-      (
-        ~third: ChordThirdType.t,
-        ~fifth: ChordFifthType.t=ChordFifthType.Perfect,
-        ~sixth: option(ChordSixthType.t)=?,
-        ~seventh: option(ChordSeventhType.t)=?,
-        ~suspended: option(ChordSuspendedType.t)=?,
-        ~extensions: option(list(ChordExtensionType.t))=?,
-        (),
-      ) => {
-    {third, fifth, sixth, seventh, suspended, extensions};
+    if (singleNotation^) {
+      ext->Belt.List.reverse->Belt.List.headExn->ChordExtensionType.notation;
+    } else {
+      ext->Belt.List.map(ChordExtensionType.notation)->Belt.List.toArray
+      |> Js.Array.joinWith("/");
+    };
   };
 
-  let intervals = t => {
-    [
-      t.sixth->Belt.Option.isNone ?
-        Some(t.third->ChordThirdType.interval) : None,
-      t.suspended->Belt.Option.map(ChordSuspendedType.interval),
-      Some(t.fifth->ChordFifthType.interval),
-      t.sixth->Belt.Option.map(ChordSixthType.interval),
-      t.seventh->Belt.Option.map(ChordSeventhType.interval),
-    ]
-    ->Belt.List.concat(
-        {
-          switch (t.extensions) {
-          | Some((extensions: list(ChordExtensionType.t))) =>
-            extensions
-            ->Belt.List.sort((a, b) =>
-                a.type_->ChordExtensionType.ExtensionType.rawValue
-                - b.type_->ChordExtensionType.ExtensionType.rawValue
-              )
-            ->Belt.List.map(ChordExtensionType.interval)
-            ->Belt.List.map(interval => Some(interval))
-          | None => []
-          };
-        },
-      )
-    ->Belt.List.keepMap(Util.identity);
-  };
+  if (seventh->Belt.Option.isSome) {
+    let seventh = Belt.Option.getExn(seventh);
 
-  let notation = ({third, fifth, sixth, seventh, suspended, extensions}) => {
-    let seventhNotation =
-      ref(
-        seventh->Belt.Option.mapWithDefault("", ChordSeventhType.notation),
-      );
-
-    let sixthNotation =
-      ref(
-        sixth->Belt.Option.mapWithDefault("", ChordSixthType.notation)
-        ++ (seventh->Belt.Option.isSome ? "/" : ""),
-      );
-
-    let suspendedNotation =
-      suspended->Belt.Option.mapWithDefault("", ChordSuspendedType.notation);
-
-    let extensionNotation = {
-      let ext =
-        extensions->Belt.Option.mapWithDefault([], extensions =>
-          extensions->Belt.List.sort((a, b) =>
-            a.type_->ChordExtensionType.ExtensionType.rawValue
-            - b.type_->ChordExtensionType.ExtensionType.rawValue
-          )
+    if (seventh == ChordSeventhType.Major
+        && extensions->Belt.Option.getWithDefault([])->Belt.List.size > 0) {
+      seventhNotation := "";
+      sixthNotation :=
+        (
+          switch (sixth) {
+          | Some(sixth) => sixth->ChordSixthType.notation
+          | None => ""
+          }
         );
-
-      let singleNotation = ref(ext->Belt.List.length > 0);
-
-      for (i in 0 to ext->Belt.List.length - 1) {
-        if (ext->Belt.List.getExn(i).accidental != Accidental.natural) {
-          singleNotation := false;
-        };
-      };
-
-      if (singleNotation^) {
-        ext->Belt.List.reverse->Belt.List.headExn->ChordExtensionType.notation;
-      } else {
-        ext->Belt.List.map(ChordExtensionType.notation)->Belt.List.toArray
-        |> Js.Array.joinWith("/");
-      };
     };
 
-    if (seventh->Belt.Option.isSome) {
-      let seventh = Belt.Option.getExn(seventh);
-
-      if (seventh == ChordSeventhType.Major
-          && extensions->Belt.Option.getWithDefault([])->Belt.List.size > 0) {
-        seventhNotation := "";
-        sixthNotation :=
-          (
-            switch (sixth) {
-            | Some(sixth) => sixth->ChordSixthType.notation
-            | None => ""
-            }
-          );
-      };
-
-      if (fifth == ChordFifthType.Augmented
-          || fifth == ChordFifthType.Diminished) {
-        third->ChordThirdType.notation
-        ++ sixthNotation^
-        ++ seventhNotation^
-        ++ fifth->ChordFifthType.notation
-        ++ suspendedNotation
-        ++ extensionNotation;
-      } else {
-        third->ChordThirdType.notation
-        ++ fifth->ChordFifthType.notation
-        ++ sixthNotation^
-        ++ seventhNotation^
-        ++ suspendedNotation
-        ++ extensionNotation;
-      };
+    if (fifth == ChordFifthType.Augmented || fifth == ChordFifthType.Diminished) {
+      third->ChordThirdType.notation
+      ++ sixthNotation^
+      ++ seventhNotation^
+      ++ fifth->ChordFifthType.notation
+      ++ suspendedNotation
+      ++ extensionNotation;
     } else {
       third->ChordThirdType.notation
       ++ fifth->ChordFifthType.notation
@@ -529,135 +522,142 @@ module ChordExtensionType = {
       ++ suspendedNotation
       ++ extensionNotation;
     };
+  } else {
+    third->ChordThirdType.notation
+    ++ fifth->ChordFifthType.notation
+    ++ sixthNotation^
+    ++ seventhNotation^
+    ++ suspendedNotation
+    ++ extensionNotation;
   };
+};
 
-  let description = ({third, fifth, sixth, seventh, suspended, extensions}) => {
-    let seventhDescription =
-      seventh->Belt.Option.map(ChordSeventhType.description);
-    let sixthDescription = sixth->Belt.Option.map(ChordSixthType.description);
-    let suspendedDescription =
-      suspended->Belt.Option.map(ChordSuspendedType.description);
+let description = ({third, fifth, sixth, seventh, suspended, extensions}) => {
+  let seventhDescription =
+    seventh->Belt.Option.map(ChordSeventhType.description);
+  let sixthDescription = sixth->Belt.Option.map(ChordSixthType.description);
+  let suspendedDescription =
+    suspended->Belt.Option.map(ChordSuspendedType.description);
 
-    let extensionDescriptions =
-      extensions->Belt.Option.mapWithDefault([], l =>
-        l
-        ->Belt.List.sort((a, b) =>
-            a.type_->ChordExtensionType.ExtensionType.rawValue
-            - b.type_->ChordExtensionType.ExtensionType.rawValue
-          )
-        ->Belt.List.map(ChordExtensionType.notation)
-        ->Belt.List.map(x => Some(x))
-      );
+  let extensionDescriptions =
+    extensions->Belt.Option.mapWithDefault([], l =>
+      l
+      ->Belt.List.sort((a, b) =>
+          a.type_->ChordExtensionType.ExtensionType.rawValue
+          - b.type_->ChordExtensionType.ExtensionType.rawValue
+        )
+      ->Belt.List.map(ChordExtensionType.notation)
+      ->Belt.List.map(x => Some(x))
+    );
 
-    let desc =
-      Belt.List.concat(
-        [
-          Some(third->ChordThirdType.description),
-          Some(fifth->ChordFifthType.description),
-          sixthDescription,
-          seventhDescription,
-          suspendedDescription,
-        ],
-        extensionDescriptions,
-      )
-      ->Belt.List.keepMap(Util.identity);
+  let desc =
+    Belt.List.concat(
+      [
+        Some(third->ChordThirdType.description),
+        Some(fifth->ChordFifthType.description),
+        sixthDescription,
+        seventhDescription,
+        suspendedDescription,
+      ],
+      extensionDescriptions,
+    )
+    ->Belt.List.keepMap(Util.identity);
 
-    desc->Belt.List.toArray |> Js.Array.joinWith("");
-  };
+  desc->Belt.List.toArray |> Js.Array.joinWith("");
+};
 
-  let all: list(t) = {
-    let rec combinations =
-            (~elements: list(ChordExtensionType.t), ~taking: int=1, ())
-            : list(list(ChordExtensionType.t)) =>
-      if (elements->Belt.List.length < 0) {
-        [];
-      } else if (elements->Belt.List.length <= 0 && taking <= 0) {
-        [[]];
-      } else if (taking == 1) {
-        elements->Belt.List.map(el => [el]);
-      } else {
-        let comb = ref([[]]);
+let all: list(t) = {
+  let rec combinations =
+          (~elements: list(ChordExtensionType.t), ~taking: int=1, ())
+          : list(list(ChordExtensionType.t)) =>
+    if (elements->Belt.List.length < 0) {
+      [];
+    } else if (elements->Belt.List.length <= 0 && taking <= 0) {
+      [[]];
+    } else if (taking == 1) {
+      elements->Belt.List.map(el => [el]);
+    } else {
+      let comb = ref([[]]);
 
-        for (index in 0 to elements->Belt.List.size - 1) {
-          let element = elements->Belt.List.getExn(index);
+      for (index in 0 to elements->Belt.List.size - 1) {
+        let element = elements->Belt.List.getExn(index);
 
-          let reducedElements =
-            elements->Belt.List.drop(index + 1)->Belt.Option.getExn;
+        let reducedElements =
+          elements->Belt.List.drop(index + 1)->Belt.Option.getExn;
 
-          comb :=
-            Belt.List.concat(
-              comb^,
-              combinations(~elements=reducedElements, ~taking=taking - 1, ())
-              ->Belt.List.map(comb => Belt.List.concat([element], comb)),
-            );
-        };
-
-        comb^;
+        comb :=
+          Belt.List.concat(
+            comb^,
+            combinations(~elements=reducedElements, ~taking=taking - 1, ())
+            ->Belt.List.map(comb => Belt.List.concat([element], comb)),
+          );
       };
 
-    let all = ref([]);
+      comb^;
+    };
 
-    let allThird = ChordThirdType.all;
+  let all = ref([]);
 
-    let allFifth = ChordFifthType.all;
+  let allThird = ChordThirdType.all;
 
-    let allSixth = [Some(ChordSixthType.Sixth), None];
+  let allFifth = ChordFifthType.all;
 
-    let allSeventh =
-      ChordSeventhType.all
-      ->Belt.List.map(x => Some(x))
-      ->Belt.List.concat([None]);
+  let allSixth = [Some(ChordSixthType.Sixth), None];
 
-    let allSus =
-      ChordSuspendedType.all
-      ->Belt.List.map(x => Some(x))
-      ->Belt.List.concat([None]);
+  let allSeventh =
+    ChordSeventhType.all
+    ->Belt.List.map(x => Some(x))
+    ->Belt.List.concat([None]);
 
-    let allExt =
-      combinations(~elements=ChordExtensionType.all, ~taking=1, ())
-      ->Belt.List.concat(
-          combinations(~elements=ChordExtensionType.all, ~taking=2, ()),
-        )
-      ->Belt.List.concat(
-          combinations(~elements=ChordExtensionType.all, ~taking=3, ()),
-        );
+  let allSus =
+    ChordSuspendedType.all
+    ->Belt.List.map(x => Some(x))
+    ->Belt.List.concat([None]);
 
-    allThird->Belt.List.forEach(third =>
-      allFifth->Belt.List.forEach(fifth =>
-        allSixth->Belt.List.forEach(sixth =>
-          allSeventh->Belt.List.forEach(seventh =>
-            allSus->Belt.List.forEach(suspended =>
-              allExt->Belt.List.forEach(extensions =>
-                all :=
-                  Belt.List.concat(
-                    all^,
-                    [
-                      make(
-                        ~third,
-                        ~fifth,
-                        ~sixth?,
-                        ~seventh?,
-                        ~suspended?,
-                        ~extensions,
-                        (),
-                      ),
-                    ],
-                  )
-              )
+  let allExt =
+    combinations(~elements=ChordExtensionType.all, ~taking=1, ())
+    ->Belt.List.concat(
+        combinations(~elements=ChordExtensionType.all, ~taking=2, ()),
+      )
+    ->Belt.List.concat(
+        combinations(~elements=ChordExtensionType.all, ~taking=3, ()),
+      );
+
+  allThird->Belt.List.forEach(third =>
+    allFifth->Belt.List.forEach(fifth =>
+      allSixth->Belt.List.forEach(sixth =>
+        allSeventh->Belt.List.forEach(seventh =>
+          allSus->Belt.List.forEach(suspended =>
+            allExt->Belt.List.forEach(extensions =>
+              all :=
+                Belt.List.concat(
+                  all^,
+                  [
+                    make(
+                      ~third,
+                      ~fifth,
+                      ~sixth?,
+                      ~seventh?,
+                      ~suspended?,
+                      ~extensions,
+                      (),
+                    ),
+                  ],
+                )
             )
           )
         )
       )
-    );
+    )
+  );
 
-    all^;
+  all^;
+};
+
+let equals = (c': option(t), c'': option(t)): bool => {
+  switch (c', c'') {
+  | (Some(c'), Some(c'')) => c'->intervals == c''->intervals
+  | (None, None) => true
+  | _ => false
   };
-
-  let equals = (c': option(t), c'': option(t)): bool => {
-    switch (c', c'') {
-    | (Some(c'), Some(c'')) => c'->intervals == c''->intervals
-    | (None, None) => true
-    | _ => false
-    };
-  };
-
+};
