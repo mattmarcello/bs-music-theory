@@ -97,6 +97,10 @@ let normalizedIntValue = k => {
 let intEqual = (k', k'') => {
   normalizedIntValue(k') == normalizedIntValue(k'');
 };
+
+let description = ({ type_, accidental }) => type_ -> KeyType.description ++ accidental -> Accidental.description
+
+
 /* let intValueEqual = (k', k'') => { */
 
 /* } */

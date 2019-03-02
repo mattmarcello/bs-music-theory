@@ -62,15 +62,39 @@ let all = [C, D, E, F, G, A, B];
 /**
   * TODO: refactor to at(~degree)
   */
+
+let toString =
+  fun
+  | C => "C"
+  | D => "D"
+  | E => "E"
+  | F => "F"
+  | G => "G"
+  | A => "A"
+  | B => "B";
+
 let atDistance: (t, int) => t =
   (key, distance) => {
+
+     /* Js.log("at distance"); */
+
+     /* Js.log2("key", key -> toString); */
+
+     /* Js.log2("distance", distance); */
+
     let index = Util.indexOf(all, key)->Belt.Option.getExn;
 
+    /* Js.log2("index", index ); */
+
     let normalizedDistance = (index + distance) mod Belt.List.length(all);
+
+    /* Js.log2("normalizedDistance", normalizedDistance  ); */
 
     let keyIndex =
       normalizedDistance < 0 ?
         Belt.List.length(all) + normalizedDistance : normalizedDistance;
+
+    /* Js.log2("keyIndex ", keyIndex   ); */
 
     Belt.List.getExn(all, keyIndex);
   };
@@ -85,16 +109,23 @@ let distanceFrom = (key, target) => {
   };
 };
 
+
+let description = toString;
+
+
 //TODO: refactor this API
 let octaveDiff: (t, Interval.t, Octave.t) => int =
   (key, interval: Interval.t, octave) => {
+
     let diff = ref(0);
     let currentKey = ref(key);
-    for (_ in 0 to interval.degree - 1) {
+
+    for (_ in 0 to interval.degree - 2) {
+
       let next =
         switch (octave) {
-        | Octave.Higher => key->atDistance(1)
-        | Lower => key->atDistance(-1)
+        | Octave.Higher => currentKey^ -> atDistance(1)
+        | Lower => currentKey^ -> atDistance(-1)
         };
 
       diff :=
@@ -111,13 +142,3 @@ let octaveDiff: (t, Interval.t, Octave.t) => int =
 
     diff^;
   };
-
-let toString =
-  fun
-  | C => "C"
-  | D => "D"
-  | E => "E"
-  | F => "F"
-  | G => "G"
-  | A => "A"
-  | B => "B";

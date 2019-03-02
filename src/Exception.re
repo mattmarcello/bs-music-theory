@@ -1,0 +1,1 @@
+exception Make(string);

@@ -43,57 +43,58 @@ testAll(
       );
     },
     {
-      let c1 = Pitch.{key: Key.make(`Type(KeyType.C)), octave: 1};
+      let c1 = PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1};
 
-      let db1 = Pitch.{key: Key.make(`StringLiteral("db")), octave: 1};
+      let db1 = PitchType.{key: Key.make(`StringLiteral("db")), octave: 1};
 
       c1->Pitch.addInterval(Interval.minor2)->Pitch.equal(db1) ?
         pass : fail("");
     },
     {
-      let c1 = Pitch.{key: Key.make(`Type(KeyType.C)), octave: 1};
+      let c1 = PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1};
 
-      let d1 = Pitch.{key: Key.make(`StringLiteral("d")), octave: 1};
+      let d1 = PitchType.{key: Key.make(`StringLiteral("d")), octave: 1};
 
       c1->Pitch.addInterval(Interval.major2)->Pitch.equal(d1) ?
         pass : fail("");
     },
     {
-      let c1 = Pitch.{key: Key.make(`Type(KeyType.C)), octave: 1};
+      let c1 = PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1};
 
-      let eb1 = Pitch.{key: Key.make(`StringLiteral("eb")), octave: 1};
+      let eb1 = PitchType.{key: Key.make(`StringLiteral("eb")), octave: 1};
 
       c1->Pitch.addInterval(Interval.minor3)->Pitch.equal(eb1) ?
         pass : fail("");
     },
     {
-      let c1 = Pitch.{key: Key.make(`Type(KeyType.C)), octave: 1};
+      let c1 = PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1};
 
-      let e1 = Pitch.{key: Key.make(`StringLiteral("e")), octave: 1};
+      let e1 = PitchType.{key: Key.make(`StringLiteral("e")), octave: 1};
 
       c1->Pitch.addInterval(Interval.major3)->Pitch.equal(e1) ?
         pass : fail("");
     },
     {
-      let c1 = Pitch.{key: Key.make(`Type(KeyType.C)), octave: 1};
+      let c1 = PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1};
 
-      let c2 = Pitch.{key: Key.make(`StringLiteral("C")), octave: 2};
+      let c2 = PitchType.{key: Key.make(`StringLiteral("C")), octave: 2};
 
       c1->Pitch.addInterval(Interval.perfect8)->Pitch.equal(c2) ?
         pass : fail("");
     },
     {
-      let d1 = Pitch.{key: Key.make(`Type(KeyType.D)), octave: 1};
+      let d1 = PitchType.{key: Key.make(`Type(KeyType.D)), octave: 1};
 
-      let csharp1 = Pitch.{key: Key.make(`StringLiteral("C#")), octave: 1};
+      let csharp1 =
+        PitchType.{key: Key.make(`StringLiteral("C#")), octave: 1};
 
       d1->Pitch.subtractInterval(Interval.minor2)->Pitch.equal(csharp1) ?
         pass : fail("");
     },
     {
-      let d1 = Pitch.{key: Key.make(`Type(KeyType.D)), octave: 1};
+      let d1 = PitchType.{key: Key.make(`Type(KeyType.D)), octave: 1};
 
-      let c1 = Pitch.{key: Key.make(`StringLiteral("C")), octave: 1};
+      let c1 = PitchType.{key: Key.make(`StringLiteral("C")), octave: 1};
 
       d1->Pitch.subtractInterval(Interval.major2)->Pitch.equal(c1) ?
         pass : fail("");
@@ -119,14 +120,12 @@ testAll(
   "frequency",
   [
     {
-      let note = Pitch.{key: Key.make(`Type(KeyType.A)), octave: 4};
+      let note = PitchType.{key: Key.make(`Type(KeyType.A)), octave: 4};
       Expect.(expect(note->Pitch.frequency) |> toEqual(440.0));
     },
     {
-      let note = Pitch.{key: Key.make(`Type(KeyType.A)), octave: 4};
+      let note = PitchType.{key: Key.make(`Type(KeyType.A)), octave: 4};
       let a4 = Pitch.nearest(440.0);
-
-      Js.log2("a4", a4->Belt.Option.map(Pitch.toString));
 
       Expect.(expect(a4) |> toEqual(Some(note)));
     },
@@ -254,11 +253,10 @@ testAll(
       ];
 
       let cMajScale =
-        Scale.{type_: ScaleType.major, key: Key.make(`Type(KeyType.C))};
+        ScaleT.{type_: ScaleType.major, key: Key.make(`Type(KeyType.C))};
 
       Expect.(expect(cMajScale |> Pitch.ScaleKeys.get) |> toEqual(cMaj));
     },
-
     {
       let cMin = [
         Key.make(`Type(KeyType.C)),
@@ -271,7 +269,7 @@ testAll(
       ];
 
       let cMinScale =
-        Scale.{type_: ScaleType.minor, key: Key.make(`Type(KeyType.C))};
+        ScaleT.{type_: ScaleType.minor, key: Key.make(`Type(KeyType.C))};
 
       Expect.(expect(cMinScale |> Pitch.ScaleKeys.get) |> toEqual(cMin));
     },
@@ -279,3 +277,67 @@ testAll(
   assertion =>
   assertion
 );
+
+test("harmonic fields", () => {
+  let cMaj =
+    ScaleT.{type_: ScaleType.major, key: Key.make(`Type(KeyType.C))};
+
+  Js.log2("cMaj", cMaj->Scale.description);
+
+  let triads: list(Chord.t) = cMaj->Scale.harmonicField(~for_=Triad, ());
+
+  let triadsExpected: list(ChordT.t) = [
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Major, ()),
+      key: Key.make(`Type(KeyType.C)),
+      inversion: 0,
+    },
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Minor, ()),
+      key: Key.make(`Type(KeyType.D)),
+      inversion: 0,
+    },
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Minor, ()),
+      key: Key.make(`Type(KeyType.E)),
+      inversion: 0,
+    },
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Major, ()),
+      key: Key.make(`Type(KeyType.F)),
+      inversion: 0,
+    },
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Major, ()),
+      key: Key.make(`Type(KeyType.G)),
+      inversion: 0,
+    },
+    Chord.{
+      type_: ChordTypeT.make(~third=ChordTypeT.ChordThirdType.Minor, ()),
+      key: Key.make(`Type(KeyType.A)),
+      inversion: 0,
+    },
+    Chord.{
+      type_:
+        ChordTypeT.make(
+          ~third=ChordTypeT.ChordThirdType.Minor,
+          ~fifth=ChordTypeT.ChordFifthType.Diminished,
+          (),
+        ),
+      key: Key.make(`Type(KeyType.B)),
+      inversion: 0,
+    },
+  ];
+
+  Js.log2(
+    "triads",
+    triads->Belt.List.toArray->Belt.Array.map(Chord.description),
+  );
+
+  Js.log2(
+    "triadsExpected",
+    triadsExpected->Belt.List.toArray->Belt.Array.map(Chord.description),
+  );
+
+  Expect.(expect(triads) |> toEqual(triadsExpected));
+});

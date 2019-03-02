@@ -84,12 +84,19 @@ let divideInt = (a, i) => initializeWithInteger(a->rawValue / i);
 
 //* TODO: doesn't support double sharp / double flat notation */
 
-let toString =
+let description =
   fun
   | Natural => ""
   | Flats(amount) => Js.String.repeat(amount, "b")
-  | Sharps(amount) => Js.String.repeat(amount, "#");
+  | Sharps(amount) => {
+	  
+	  Js.String.repeat(amount, "#");
+  }
 
 
+let notation =
+  fun
+  | Natural => "♮"
+  | type_ => description(type_);
 
-
+let toString = notation

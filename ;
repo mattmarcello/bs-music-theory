@@ -6,13 +6,13 @@ let toString = ({key, octave} : t ) => {
   key->Key.toString ++ string_of_int(octave);
 };
 
-let rawValue = ({key, octave}: t ) => {
+let rawValue = ({key, octave}) => {
   let semitones =
     key.type_->KeyType.rawValue + key.accidental->Accidental.rawValue;
   semitones + (octave + 1) * 12;
 };
 
-let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) : t => {
+let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) => {
   let octave = midiNote / 12 - 1;
   let keyIndex = midiNote mod 12;
   let key =
@@ -29,7 +29,7 @@ let addHalfstep: (t, int) => t =
     makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
   };
 
-let makeWithStringLiteral = (str: string) : t  => {
+let makeWithStringLiteral = str => {
   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)(-?)(\\d+)");
 
   switch (
@@ -90,7 +90,7 @@ let subtractInterval: (t, Interval.t) => t =
 
     // convert pitch
 
-    let convertedPitch :  t = {
+    let convertedPitch = {
       key: Key.make(`Type(targetKeyType)),
       octave: targetOctave,
     };
@@ -116,7 +116,7 @@ let addInterval = (pitch: t, interval: Interval.t) => {
 
   //convert pitch
 
-  let convertedPitch : t = {
+  let convertedPitch = {
     key: Key.makeWithType(~type_=targetKeyType, ()),
     octave: targetOctave,
   };
@@ -135,6 +135,7 @@ let addInterval = (pitch: t, interval: Interval.t) => {
 let equal = (p', p'') => p'->rawValue == p''->rawValue;
 
 let frequency = pitch => {
+  Js.log2("pitch raw value", pitch->rawValue);
 
   Js.Math.pow_float(
     ~base=2.,
@@ -148,22 +149,35 @@ let nearest = frequency' => {
     Belt.Array.range(1, 7)
     ->Belt.List.fromArray
     ->Belt.List.map(octave =>
-        Key.keysWithSharps->Belt.List.map(key => PitchType.{key, octave})
+        Key.keysWithSharps->Belt.List.map(key => {key, octave})
       )
     ->Belt.List.flatten;
 
+  allPitches->Belt.List.map(frequency)->Belt.List.toArray->Js.log;
 
   let results =
     allPitches->Belt.List.map(pitch =>
       (pitch, Js.Math.abs_float(pitch->frequency -. frequency'))
     );
 
+  Js.log2(
+    "results",
+    results
+    ->Belt.List.toArray
+    ->Belt.Array.map(thing => (thing->fst->toString, thing->snd)),
+  );
 
   let sorted =
     results->Belt.List.sort(((_, d'), (_, d'')) =>
       d' -. d'' |> int_of_float
     );
 
+  Js.log2(
+    "sorted",
+    sorted
+    ->Belt.List.toArray
+    ->Belt.Array.map(thing => (thing->fst->toString, thing->snd)),
+  );
   sorted->Belt.List.head->Belt.Option.map(fst);
 };
 
@@ -172,7 +186,7 @@ module ScaleKeys = {
   module B = Belt;
 
   // TODO: rename this
-  let acrossOctaves = (~scale: ScaleT.t, ~octaves: list(int), ()) => {
+  let acrossOctaves = (~scale: Scale.t, ~octaves: list(int), ()) => {
     octaves->B.List.reduce(
       [],
       (acc, octave) => {
@@ -191,7 +205,7 @@ module ScaleKeys = {
     );
   };
 
-  let get: ScaleT.t => list(Key.t) =
+  let get: Scale.t => list(Key.t) =
     scale => {
       acrossOctaves(~scale, ~octaves=[1], ())
       ->Belt.List.map(pitch => pitch.key);
@@ -224,7 +238,7 @@ let subtractPitch: (t, t) => Interval.t =
       | _ => false
       };
 
-    let majorScale: ScaleT.t = {type_: ScaleType.major, key: bottom.key};
+    let majorScale: Scale.t = {type_: ScaleType.major, key: bottom.key};
 
     ScaleKeys.get(majorScale)->Belt.List.has(top.key, (==)) ?
       {
@@ -260,6 +274,3 @@ let subtractPitch: (t, t) => Interval.t =
         }
       );
   };
-
-
-let description = ({ key, octave} : PitchType.t) => key -> Key.description  ++ octave -> string_of_int

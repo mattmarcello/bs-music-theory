@@ -4,9 +4,15 @@ type t = {
   semitones: int,
 };
 
+let equal = (i', i'') => i'.semitones == i''.semitones;
 
 //TODO: have consistent format for math operators
 
+// TODO: move and hide behind rei file addAcccidental defined originally defined in Chord.swift as an extension
+
+let addAccidental = (interval: t, accidental: Accidental.t) => {
+  interval.semitones + accidental->Accidental.rawValue;
+};
 
 // TODO: remove
 let qualityToString =
@@ -15,13 +21,17 @@ let qualityToString =
   | Diminished => "diminished"
   | Minor => "minor"
   | Major => "major"
-  | Augmented => "augmented"
+  | Augmented => "augmented";
 
-let toString = ({ quality, degree,  semitones }) => {
+let toString = ({quality, degree, semitones}) => {
+  qualityToString(quality)
+  ++ " "
+  ++ string_of_int(degree)
+  ++ " "
+  ++ string_of_int(semitones);
+};
 
-	qualityToString(quality) ++ " " ++ string_of_int(degree) ++ " " ++ string_of_int(semitones);
-
-}
+let description = toString;
 
 let perfect1 = {quality: Perfect, degree: 1, semitones: 0};
 let perfect4 = {quality: Perfect, degree: 4, semitones: 5};
@@ -97,6 +107,7 @@ let all = [
   minor10,
   minor13,
   minor14,
+
   major2,
   major3,
   major6,
@@ -105,6 +116,7 @@ let all = [
   major10,
   major13,
   major14,
+
   diminished1,
   diminished2,
   diminished3,
@@ -120,6 +132,7 @@ let all = [
   diminished13,
   diminished14,
   diminished15,
+
   augmented1,
   augmented2,
   augmented3,
