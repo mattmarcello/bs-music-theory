@@ -20,21 +20,18 @@ let pitches =
 
   let intervals = ref(type_->ChordTypeT.intervals);
 
-  Js.log2("intervals", intervals^ -> Belt.List.map(
-		  
-		  Interval.description
-
-		  ) -> Belt.List.toArray);
+  Js.log2(
+    "intervals",
+    (intervals^)->Belt.List.map(Interval.description)->Belt.List.toArray,
+  );
 
   for (_ in 0 to inversion - 1) {
     intervals := (intervals^)->shifted;
   };
 
-
   let root = PitchType.{key, octave};
 
   let invertedPitches = (intervals^)->Belt.List.map(Pitch.addInterval(root));
-
 
   invertedPitches->Belt.List.mapWithIndex((index, pitch) =>
     index < type_->ChordTypeT.intervals->Belt.List.length - inversion ?
@@ -54,6 +51,12 @@ let pitchesWithOctaves =
 
 let keys: t => list(Key.t) =
   t => t->pitches(~octave=1, ())->Belt.List.map(pitch => pitch.key);
+
+let inversions = t => {
+  Belt.Array.range(0, t->keys->Belt.List.length - 1)
+  ->Belt.List.fromArray
+  ->Belt.List.map(inversion => {...t, inversion});
+};
 
 let romanNumeric =
     ({type_, key, inversion}: ChordT.t, ~for_ as scale: ScaleT.t) => {

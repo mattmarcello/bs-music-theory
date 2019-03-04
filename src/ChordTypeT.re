@@ -421,33 +421,38 @@ let make =
       (),
     ) => {
   let extensions_ =
-    switch (extensions) {
-    | Some([extension])
-        when extension.type_ == ChordExtensionType.ExtensionType.Eleventh => Some([
+    switch ((extensions, seventh)) {
+    | (Some([extension]), Some(_))
+        when extension.type_ == ChordExtensionType.ExtensionType.Eleventh  =>
+      Some([
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,
           (),
-        ) -> Belt.Option.getExn,
+        )
+        ->Belt.Option.getExn,
         extension,
       ])
-    
-    | Some([extension])
-        when extension.type_ == ChordExtensionType.ExtensionType.Thirteenth => Some([
+
+    | (Some([extension]), Some(_))
+        when extension.type_ == ChordExtensionType.ExtensionType.Thirteenth  =>
+      Some([
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,
           (),
-        ) -> Belt.Option.getExn,
+        )
+        ->Belt.Option.getExn,
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Eleventh,
           (),
-        ) -> Belt.Option.getExn,
+        )
+        ->Belt.Option.getExn,
         extension,
       ])
-   
-   | _ => extensions
+
+    | _ => extensions
     };
 
-  {third, fifth, sixth, seventh, suspended, extensions: extensions_ };
+  {third, fifth, sixth, seventh, suspended, extensions: extensions_};
 };
 
 let intervals = t => {
