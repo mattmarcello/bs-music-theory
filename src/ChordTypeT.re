@@ -228,7 +228,7 @@ module ChordExtensionType = {
   type t = {
     type_: ExtensionType.t,
     accidental: Accidental.t,
-    isAdded: bool,
+    isAdded: bool //TODO:  might get rid of this
   };
 
   //TODO: consider renaming this
@@ -344,7 +344,7 @@ type t = {
 
 let makeWithIntervals: list(Interval.t) => option(t) =
   intervals => {
-    let third = ref(None) 
+    let third = ref(None);
     let fifth = ref(None);
     let sixth = ref(None);
     let seventh = ref(None);
@@ -406,11 +406,7 @@ let makeWithIntervals: list(Interval.t) => option(t) =
         extensions: extensions^,
       })
 
-    | _ =>
-      Js.log((third^)->Belt.Option.isNone ? "no third" : "there is a third");
-      Js.log((fifth^)->Belt.Option.isNone ? "no fifth" : "there is a fifth");
-
-      None;
+    | _ => None
     };
   };
 
@@ -424,11 +420,39 @@ let make =
       ~extensions: option(list(ChordExtensionType.t))=?,
       (),
     ) => {
-  {third, fifth, sixth, seventh, suspended, extensions};
+  let extensions_ =
+    switch (extensions) {
+    | Some([extension])
+        when extension.type_ == ChordExtensionType.ExtensionType.Eleventh => Some([
+        ChordExtensionType.make(
+          ~type_=ChordExtensionType.ExtensionType.Ninth,
+          (),
+        ) -> Belt.Option.getExn,
+        extension,
+      ])
+    
+    | Some([extension])
+        when extension.type_ == ChordExtensionType.ExtensionType.Thirteenth => Some([
+        ChordExtensionType.make(
+          ~type_=ChordExtensionType.ExtensionType.Ninth,
+          (),
+        ) -> Belt.Option.getExn,
+        ChordExtensionType.make(
+          ~type_=ChordExtensionType.ExtensionType.Eleventh,
+          (),
+        ) -> Belt.Option.getExn,
+        extension,
+      ])
+   
+   | _ => extensions
+    };
+
+  {third, fifth, sixth, seventh, suspended, extensions: extensions_ };
 };
 
 let intervals = t => {
   [
+    Some(Interval.perfect1),
     t.sixth->Belt.Option.isNone ?
       Some(t.third->ChordThirdType.interval) : None,
     t.suspended->Belt.Option.map(ChordSuspendedType.interval),

@@ -282,8 +282,6 @@ test("harmonic fields", () => {
   let cMaj =
     ScaleT.{type_: ScaleType.major, key: Key.make(`Type(KeyType.C))};
 
-  Js.log2("cMaj", cMaj->Scale.description);
-
   let triads: list(Chord.t) = cMaj->Scale.harmonicField(~for_=Triad, ());
 
   let triadsExpected: list(ChordT.t) = [
@@ -329,15 +327,82 @@ test("harmonic fields", () => {
     },
   ];
 
-  Js.log2(
-    "triads",
-    triads->Belt.List.toArray->Belt.Array.map(Chord.description),
-  );
-
-  Js.log2(
-    "triadsExpected",
-    triadsExpected->Belt.List.toArray->Belt.Array.map(Chord.description),
-  );
-
   Expect.(expect(triads) |> toEqual(triadsExpected));
 });
+
+testAll(
+  "chords",
+  [
+    {
+      let cMajNotes = [
+        Key.make(`Type(KeyType.C)),
+        Key.make(`Type(KeyType.E)),
+        Key.make(`Type(KeyType.G)),
+      ];
+
+      let cMaj =
+        ChordT.{
+          type_: ChordTypeT.make(~third=Major, ()),
+          key: Key.make(`Type(KeyType.C)),
+          inversion: 0 // TODO shouldn't have to specify inversion
+        };
+
+      Expect.(expect(cMajNotes) |> toEqual(cMaj->Chord.keys));
+    },
+    {
+      let cMinNotes = [
+        Key.make(`Type(KeyType.C)),
+        Key.{type_: KeyType.E, accidental: Accidental.flat},
+        Key.make(`Type(KeyType.G)),
+      ];
+
+      let cMin =
+        ChordT.{
+          type_: ChordTypeT.make(~third=Minor, ()),
+          key: Key.make(`Type(KeyType.C)),
+          inversion: 0 // TODO shouldn't have to specify inversion
+        };
+
+      Expect.(expect(cMinNotes) |> toEqual(cMin->Chord.keys));
+    },
+    {
+      let c13Pitches = [
+        PitchType.{key: Key.make(`Type(KeyType.C)), octave: 1},
+        PitchType.{key: Key.make(`Type(KeyType.E)), octave: 1},
+        PitchType.{key: Key.make(`Type(KeyType.G)), octave: 1},
+        PitchType.{
+          key: Key.{type_: KeyType.B, accidental: Accidental.flat},
+          octave: 1,
+        },
+        PitchType.{key: Key.make(`Type(KeyType.D)), octave: 2},
+        PitchType.{key: Key.make(`Type(KeyType.F)), octave: 2},
+        PitchType.{key: Key.make(`Type(KeyType.A)), octave: 2},
+      ];
+
+      let c13 =
+        ChordT.{
+          type_:
+            ChordTypeT.make(
+              ~third=Major,
+              ~seventh=Dominant,
+              ~extensions=[
+                ChordTypeT.ChordExtensionType.make(
+                  ~type_=ChordTypeT.ChordExtensionType.ExtensionType.Thirteenth,
+                  (),
+                )
+                ->Belt.Option.getExn //TODO: this is a horrible API ,
+              ],
+              (),
+            ),
+          key: Key.make(`Type(KeyType.C)),
+          inversion: 0 //TODO: shouldn't have to specify version j
+        };
+
+      let actual = c13->Chord.pitches(~octave=1, ());
+
+      Expect.(expect(actual) |> toEqual(c13Pitches));
+    },
+  ],
+  assertion =>
+  assertion
+);

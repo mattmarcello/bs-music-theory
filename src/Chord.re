@@ -20,13 +20,21 @@ let pitches =
 
   let intervals = ref(type_->ChordTypeT.intervals);
 
+  Js.log2("intervals", intervals^ -> Belt.List.map(
+		  
+		  Interval.description
+
+		  ) -> Belt.List.toArray);
+
   for (_ in 0 to inversion - 1) {
     intervals := (intervals^)->shifted;
   };
 
+
   let root = PitchType.{key, octave};
 
   let invertedPitches = (intervals^)->Belt.List.map(Pitch.addInterval(root));
+
 
   invertedPitches->Belt.List.mapWithIndex((index, pitch) =>
     index < type_->ChordTypeT.intervals->Belt.List.length - inversion ?
@@ -136,5 +144,8 @@ let description = ({type_, key, inversion}: ChordT.t) => {
   let inversionNotation =
     inversion > 0 ? " " ++ string_of_int(inversion) ++ ". Inversion" : "";
 
-  key->Key.description ++ " " ++ type_->ChordTypeT.description ++ inversionNotation;
+  key->Key.description
+  ++ " "
+  ++ type_->ChordTypeT.description
+  ++ inversionNotation;
 };
