@@ -1,7 +1,5 @@
 module ChordThirdType = {
-  type t =
-    | Major
-    | Minor;
+  include Model.ChordThirdType;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -37,10 +35,7 @@ module ChordThirdType = {
 };
 
 module ChordFifthType = {
-  type t =
-    | Perfect
-    | Diminished
-    | Augmented;
+  include Model.ChordFifthType;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -80,8 +75,7 @@ module ChordFifthType = {
 };
 
 module ChordSixthType = {
-  type t =
-    | Sixth;
+  include Model.ChordSixthType;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -111,10 +105,7 @@ module ChordSixthType = {
 };
 
 module ChordSeventhType = {
-  type t =
-    | Major
-    | Dominant
-    | Diminished;
+  include Model.ChordSeventhType;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -154,9 +145,7 @@ module ChordSeventhType = {
 };
 
 module ChordSuspendedType = {
-  type t =
-    | Sus2
-    | Sus4;
+  include Model.ChordSuspendedType;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -193,10 +182,7 @@ module ChordSuspendedType = {
 
 module ChordExtensionType = {
   module ExtensionType = {
-    type t =
-      | Ninth
-      | Eleventh
-      | Thirteenth;
+    include Model.ExtensionType;
 
     let rawValue =
       fun
@@ -225,15 +211,11 @@ module ChordExtensionType = {
     let all = [Ninth, Eleventh, Thirteenth];
   };
 
-  type t = {
-    type_: ExtensionType.t,
-    accidental: Accidental.t,
-    isAdded: bool //TODO:  might get rid of this
-  };
+  include Model.ChordExtensionType;
 
   //TODO: consider renaming this
   let makeWithType =
-      (~type_: ExtensionType.t, ~accidental=Accidental.Natural, ()) => {
+      (~type_: Model.ExtensionType.t, ~accidental=Accidental.Natural, ()) => {
     type_,
     accidental,
     isAdded: false,
@@ -333,14 +315,7 @@ module ChordExtensionType = {
 
 /* TODO: Math operators on Chord type */
 
-type t = {
-  third: ChordThirdType.t,
-  fifth: ChordFifthType.t,
-  sixth: option(ChordSixthType.t),
-  seventh: option(ChordSeventhType.t),
-  suspended: option(ChordSuspendedType.t),
-  extensions: option(list(ChordExtensionType.t)),
-};
+include Model.ChordType;
 
 let makeWithIntervals: list(Interval.t) => option(t) =
   intervals => {
@@ -421,9 +396,9 @@ let make =
       (),
     ) => {
   let extensions_ =
-    switch ((extensions, seventh)) {
+    switch (extensions, seventh) {
     | (Some([extension]), Some(_))
-        when extension.type_ == ChordExtensionType.ExtensionType.Eleventh  =>
+        when extension.type_ == ChordExtensionType.ExtensionType.Eleventh =>
       Some([
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,
@@ -434,7 +409,7 @@ let make =
       ])
 
     | (Some([extension]), Some(_))
-        when extension.type_ == ChordExtensionType.ExtensionType.Thirteenth  =>
+        when extension.type_ == ChordExtensionType.ExtensionType.Thirteenth =>
       Some([
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,

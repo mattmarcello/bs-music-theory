@@ -1,7 +1,4 @@
-type t = {
-  beats: int,
-  noteValue: NoteValueType.t,
-};
+include Model.TimeSignature;
 
 let makeWithBeatsAndDivision = (beats, division) => {
   let noteValue = NoteValueType.make(`FloatLiteral(division));

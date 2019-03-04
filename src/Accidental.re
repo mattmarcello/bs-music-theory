@@ -1,7 +1,4 @@
-type t =
-  | Natural
-  | Flats(int)
-  | Sharps(int);
+include Model.Accidental;
 
 let makeWithInteger = i =>
   if (i == 0) {

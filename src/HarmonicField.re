@@ -1,11 +1,4 @@
-//TODO: should this really be in its own file?
-
-type t =
-  | Triad
-  | Tetrad
-  | Ninth
-  | Eleventh
-  | Thirteenth;
+include Model.HarmonicField;
 
 let all = [Triad, Tetrad, Ninth, Eleventh, Thirteenth];
 

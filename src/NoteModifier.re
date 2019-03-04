@@ -1,8 +1,4 @@
-type t =
-  | Default
-  | Dotted
-  | Triplet
-  | Quintuplet;
+include Model.NoteModifier;
 
 let rawValue =
   fun

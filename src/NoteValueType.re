@@ -1,12 +1,4 @@
-type t =
-  | DoubleWhole
-  | Whole
-  | Half
-  | Quarter
-  | Eighth
-  | Sixteenth
-  | Thirtysecond
-  | Sixtyfourth;
+include Model.NoteValueType;
 
 let rawValue =
   fun
@@ -18,7 +10,6 @@ let rawValue =
   | Sixteenth => 16.
   | Thirtysecond => 32.
   | Sixtyfourth => 64.;
-
 
 let makeWithFloatLiteral = fun 
   | 0.5 => Some(DoubleWhole)

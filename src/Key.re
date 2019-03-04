@@ -1,7 +1,4 @@
-type t = {
-  type_: KeyType.t,
-  accidental: Accidental.t,
-};
+include Model.Key;
 
 let makeWithStringLiteral = str => {
   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)");

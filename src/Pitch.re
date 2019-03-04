@@ -1,4 +1,4 @@
-type t = PitchType.t;
+include Model.Pitch;
 
 //* TODO: maybe it would be good to make this nicer */
 
@@ -148,7 +148,7 @@ let nearest = frequency' => {
     Belt.Array.range(1, 7)
     ->Belt.List.fromArray
     ->Belt.List.map(octave =>
-        Key.keysWithSharps->Belt.List.map(key => PitchType.{key, octave})
+        Key.keysWithSharps->Belt.List.map(key => {key, octave})
       )
     ->Belt.List.flatten;
 
@@ -172,7 +172,7 @@ module ScaleKeys = {
   module B = Belt;
 
   // TODO: rename this
-  let acrossOctaves = (~scale: ScaleT.t, ~octaves: list(int), ()) => {
+  let acrossOctaves = (~scale: Scale.t, ~octaves: list(int), ()) => {
     octaves->B.List.reduce(
       [],
       (acc, octave) => {
@@ -191,7 +191,7 @@ module ScaleKeys = {
     );
   };
 
-  let get: ScaleT.t => list(Key.t) =
+  let get: Scale.t => list(Key.t) =
     scale => {
       acrossOctaves(~scale, ~octaves=[1], ())
       ->Belt.List.map(pitch => pitch.key);
@@ -224,7 +224,7 @@ let subtractPitch: (t, t) => Interval.t =
       | _ => false
       };
 
-    let majorScale: ScaleT.t = {type_: ScaleType.major, key: bottom.key};
+    let majorScale: Scale.t = {type_: ScaleType.major, key: bottom.key};
 
     ScaleKeys.get(majorScale)->Belt.List.has(top.key, (==)) ?
       {
@@ -262,4 +262,4 @@ let subtractPitch: (t, t) => Interval.t =
   };
 
 
-let description = ({ key, octave} : PitchType.t) => key -> Key.description  ++ octave -> string_of_int
+let description = ({ key, octave}) => key -> Key.description  ++ octave -> string_of_int

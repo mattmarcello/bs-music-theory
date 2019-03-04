@@ -1,11 +1,4 @@
-type t =
-  | C
-  | D
-  | E
-  | F
-  | G
-  | A
-  | B;
+include Model.KeyType;
 
 let make =
   fun

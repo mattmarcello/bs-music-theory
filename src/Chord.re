@@ -1,7 +1,7 @@
 //TODO: notation
 //TODO: description
 
-type t = ChordT.t;
+include Model.Chord;
 
 let equals = (t': option(t), t'': option(t)) => {
   switch (t', t'') {
@@ -12,13 +12,13 @@ let equals = (t': option(t), t'': option(t)) => {
 };
 
 let pitches =
-    ({type_, key, inversion}: ChordT.t, ~octave: int, ()): list(PitchType.t) => {
+    ({type_, key, inversion}, ~octave: int, ()): list(Model.Pitch.t) => {
   let shifted =
     fun
     | [head, ...tail] => Belt.List.concat(tail, [head])
     | l => l;
 
-  let intervals = ref(type_->ChordTypeT.intervals);
+  let intervals = ref(type_->ChordType.intervals);
 
   Js.log2(
     "intervals",
@@ -29,20 +29,20 @@ let pitches =
     intervals := (intervals^)->shifted;
   };
 
-  let root = PitchType.{key, octave};
+  let root = Pitch.{key, octave};
 
   let invertedPitches = (intervals^)->Belt.List.map(Pitch.addInterval(root));
 
   invertedPitches->Belt.List.mapWithIndex((index, pitch) =>
-    index < type_->ChordTypeT.intervals->Belt.List.length - inversion ?
-      pitch : PitchType.{key: pitch.key, octave: pitch.octave + 1}
+    index < type_->ChordType.intervals->Belt.List.length - inversion ?
+      pitch : Pitch.{key: pitch.key, octave: pitch.octave + 1}
   );
 };
 
 // TODO: rename
 let pitchesWithOctaves =
-    ({type_, key, inversion}: ChordT.t, ~octaves: list(int), ())
-    : list(PitchType.t) => {
+    ({type_, key, inversion}, ~octaves: list(int), ())
+    : list(Pitch.t) => {
   octaves
   ->Belt.List.map(octave => pitches({type_, key, inversion}, ~octave, ()))
   ->Belt.List.flatten
@@ -59,7 +59,7 @@ let inversions = t => {
 };
 
 let romanNumeric =
-    ({type_, key, inversion}: ChordT.t, ~for_ as scale: ScaleT.t) => {
+    ({type_, key, inversion}, ~for_ as scale: Scale.t) => {
   //TODO: ScalePitch.get MUST BE REWRITTEN
 
   let chordIndex = scale->Scale.ScalePitch.get->Util.indexOf(key);
@@ -81,7 +81,7 @@ let romanNumeric =
   | Some(roman) =>
     let roman = ref(roman);
 
-    if (type_.third == ChordTypeT.ChordThirdType.Minor) {
+    if (type_.third == ChordType.ChordThirdType.Minor) {
       roman := (roman^)->Js.String.toLowerCase;
     };
 
@@ -89,11 +89,11 @@ let romanNumeric =
       roman := roman^ ++ "6";
     };
 
-    if (type_.fifth == ChordTypeT.ChordFifthType.Augmented) {
+    if (type_.fifth == ChordType.ChordFifthType.Augmented) {
       roman := roman^ ++ "+";
     };
 
-    if (type_.fifth == ChordTypeT.ChordFifthType.Diminished) {
+    if (type_.fifth == ChordType.ChordFifthType.Diminished) {
       roman := roman^ ++ "°";
     };
 
@@ -117,18 +117,18 @@ let romanNumeric =
         type_.extensions
         ->Belt.Option.map(extensions =>
             Belt.List.sort(extensions, (a, b) =>
-              a.type_->ChordTypeT.ChordExtensionType.ExtensionType.rawValue
-              - b.type_->ChordTypeT.ChordExtensionType.ExtensionType.rawValue
+              a.type_->ChordType.ChordExtensionType.ExtensionType.rawValue
+              - b.type_->ChordType.ChordExtensionType.ExtensionType.rawValue
             )
           )
         ->Belt.Option.flatMap(Belt.List.head);
 
       switch (last) {
-      | Some((extension: ChordTypeT.ChordExtensionType.t)) =>
+      | Some((extension: ChordType.ChordExtensionType.t)) =>
         roman :=
           roman^
           ++ extension.type_
-             ->ChordTypeT.ChordExtensionType.ExtensionType.rawValue
+             ->ChordType.ChordExtensionType.ExtensionType.rawValue
              ->string_of_int
 
       | None => ()
@@ -143,12 +143,12 @@ let romanNumeric =
   };
 };
 
-let description = ({type_, key, inversion}: ChordT.t) => {
+let description = ({type_, key, inversion}) => {
   let inversionNotation =
     inversion > 0 ? " " ++ string_of_int(inversion) ++ ". Inversion" : "";
 
   key->Key.description
   ++ " "
-  ++ type_->ChordTypeT.description
+  ++ type_->ChordType.description
   ++ inversionNotation;
 };

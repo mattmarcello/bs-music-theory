@@ -1,10 +1,14 @@
 module B = Belt;
 
-type t = ScaleT.t;
+include Model.Scale;
 
+//TODO: remove this 
 module ScalePitch = {
+
   type scale = t;
-  type t = PitchType.t;
+
+
+  type t = Model.Pitch.t;
 
   let rawValue = ({key, octave}: t) => {
     let semitones =
@@ -19,7 +23,7 @@ module ScalePitch = {
       (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
       ->Belt.List.getExn(keyIndex);
 
-    PitchType.{octave, key};
+    Model.Pitch.{octave, key};
   };
   let makeWithRawValue = (~rawValue, ()) =>
     makeWithMidiNote(~midiNote=rawValue, ());
@@ -42,7 +46,7 @@ module ScalePitch = {
     //convert pitch
 
     let convertedPitch =
-      PitchType.{
+      Model.Pitch.{
         key: Key.makeWithType(~type_=targetKeyType, ()),
         octave: targetOctave,
       };
@@ -165,12 +169,12 @@ module ScalePitch = {
 /*   }; */
 
 let harmonicField =
-    (t: t, ~for_ as field: HarmonicField.t, ~inversion=0, ()): list(ChordT.t) => {
+    (t: t, ~for_ as field: HarmonicField.t, ~inversion=0, ()): list(Model.Chord.t) => {
   let octaves = [0, 1, 2, 3, 4];
 
   let scalePitches = ScalePitch.acrossOctaves(t, ~octaves, ());
 
-  let chords: ref(list(ChordT.t)) = ref([]);
+  let chords: ref(list(Model.Chord.t)) = ref([]);
 
   for (i in 0 to scalePitches->Belt.List.length / octaves->Belt.List.length - 1) {
     let chordPitches =
@@ -224,7 +228,7 @@ let harmonicField =
         pitch->ScalePitch.subtractPitch(root)
       );
 
-    switch (ChordTypeT.makeWithIntervals(intervals)) {
+    switch (ChordType.makeWithIntervals(intervals)) {
     | None => {
       ();
 	    }
@@ -232,7 +236,7 @@ let harmonicField =
       chords :=
         Belt.List.concat(
           chords^,
-          [ChordT.{type_: chord, key: root.key, inversion: 0}],
+          [Model.Chord.{type_: chord, key: root.key, inversion: 0}],
         )
     };
   };
@@ -240,7 +244,7 @@ let harmonicField =
   chords^;
 };
 
-let description = (t: ScaleT.t) => {
+let description = (t) => {
   t.key->Key.description
   ++ " "
   ++ t.type_.description

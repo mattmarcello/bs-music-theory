@@ -1,7 +1,4 @@
-type t = {
-  intervals: list(Interval.t),
-  description: string,
-};
+include Model.ScaleType;
 
 let ionian = {
   intervals:

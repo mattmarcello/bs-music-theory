@@ -1,8 +1,4 @@
-type t = {
-  quality: Interval_Quality.t,
-  degree: int,
-  semitones: int,
-};
+include Model.Interval;
 
 let equal = (i', i'') => i'.semitones == i''.semitones;
 

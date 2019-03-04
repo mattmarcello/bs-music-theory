@@ -1,7 +1,1 @@
-type t =
-  | Diminished
-  | Perfect
-  | Minor
-  | Major
-  | Augmented;
-
+include Model.Quality;

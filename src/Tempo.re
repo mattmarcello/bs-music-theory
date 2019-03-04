@@ -1,7 +1,4 @@
-type t = {
-  timeSignature: TimeSignature.t,
-  bpm: float,
-};
+include Model.Tempo;
 
 let default = {timeSignature: TimeSignature.default, bpm: 120.};
 

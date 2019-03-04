@@ -4,7 +4,7 @@ describe("pitch", () => {
   test("sanity", () => {
     let key = Key.makeWithType(~type_=C, ());
 
-    let pitch = PitchType.{key, octave: 1};
+    let pitch = Pitch.{key, octave: 1};
 
     Expect.(
       expect(
@@ -48,19 +48,19 @@ describe("pitch", () => {
 
   test("subtract halfstep", () => {
     let pitch' =
-      PitchType.{key: Key.makeWithType(~type_=C, ()), octave: 1}
+      Pitch.{key: Key.makeWithType(~type_=C, ()), octave: 1}
       ->Pitch.subtractHalfstep(1);
 
-    let pitch'' = PitchType.{key: Key.makeWithType(~type_=B, ()), octave: 0};
+    let pitch'' = Pitch.{key: Key.makeWithType(~type_=B, ()), octave: 0};
 
     Expect.(expect(pitch') |> toEqual(pitch''));
   });
 
   test("subtractPitch", () => {
 
-    let c1 = PitchType.{key: Key.makeWithType(~type_=C, ()), octave: 1};
+    let c1 = Pitch.{key: Key.makeWithType(~type_=C, ()), octave: 1};
 
-    let d1  = PitchType.{key: Key.makeWithType(~type_=D, ()), octave: 1};
+    let d1  = Pitch.{key: Key.makeWithType(~type_=D, ()), octave: 1};
 
     let actual = d1->Pitch.subtractPitch(c1);
 

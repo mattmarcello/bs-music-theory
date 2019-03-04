@@ -1,7 +1,4 @@
-type t = {
-  type_: NoteValueType.t,
-  modifier: NoteModifier.t,
-};
+include Model.NoteValue;
 
 let make = fun
  | `Type(noteValueType) => { 

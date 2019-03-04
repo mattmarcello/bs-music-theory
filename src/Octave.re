@@ -1,1 +1,1 @@
-type t = Lower | Higher;
+include Model.Octave;
