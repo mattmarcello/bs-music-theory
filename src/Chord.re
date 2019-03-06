@@ -1,7 +1,11 @@
-//TODO: notation
-//TODO: description
-
 include Model.Chord;
+
+let make = (~type_: ChordType.t, ~key: Key.t, ~inversion: int=0, ()): t => {
+  type_,
+  key,
+  inversion,
+};
+
 
 let equals = (t': option(t), t'': option(t)) => {
   switch (t', t'') {
@@ -10,6 +14,7 @@ let equals = (t': option(t), t'': option(t)) => {
   | _ => false
   };
 };
+
 
 let pitches =
     ({type_, key, inversion}, ~octave: int, ()): list(Model.Pitch.t) => {
@@ -20,10 +25,6 @@ let pitches =
 
   let intervals = ref(type_->ChordType.intervals);
 
-  Js.log2(
-    "intervals",
-    (intervals^)->Belt.List.map(Interval.description)->Belt.List.toArray,
-  );
 
   for (_ in 0 to inversion - 1) {
     intervals := (intervals^)->shifted;
@@ -39,10 +40,8 @@ let pitches =
   );
 };
 
-// TODO: rename
 let pitchesWithOctaves =
-    ({type_, key, inversion}, ~octaves: list(int), ())
-    : list(Pitch.t) => {
+    ({type_, key, inversion}, ~octaves: list(int), ()): list(Pitch.t) => {
   octaves
   ->Belt.List.map(octave => pitches({type_, key, inversion}, ~octave, ()))
   ->Belt.List.flatten
@@ -58,8 +57,7 @@ let inversions = t => {
   ->Belt.List.map(inversion => {...t, inversion});
 };
 
-let romanNumeric =
-    ({type_, key, inversion}, ~for_ as scale: Scale.t) => {
+let romanNumeric = ({type_, key, inversion}, ~for_ as scale: Scale.t) => {
   //TODO: ScalePitch.get MUST BE REWRITTEN
 
   let chordIndex = scale->Scale.ScalePitch.get->Util.indexOf(key);
@@ -143,6 +141,15 @@ let romanNumeric =
   };
 };
 
+let notation = t => {
+  let keys = keys(t);
+  let inversionNotation =
+    t.inversion > 0 && t.inversion < keys->Belt.List.length ?
+      keys->Belt.List.headExn->Key.description : "";
+
+  t.key->Key.description ++ t.type_->ChordType.notation ++ inversionNotation;
+};
+
 let description = ({type_, key, inversion}) => {
   let inversionNotation =
     inversion > 0 ? " " ++ string_of_int(inversion) ++ ". Inversion" : "";
@@ -152,3 +159,8 @@ let description = ({type_, key, inversion}) => {
   ++ type_->ChordType.description
   ++ inversionNotation;
 };
+
+module Infix = {
+	let (==) = equals;
+
+}
