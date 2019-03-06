@@ -48,7 +48,7 @@ let makeWithStringLiteral = (str: string) : t  => {
     ]) =>
     let keyType = KeyType.make(`StringLiteral(keyTypeString));
 
-    let accidental = Accidental.make(`StringLiteral(accidentalString));
+    let accidental = Accidental.makeWithString(accidentalString);
 
     let octave = int_of_string(octaveString) * (signString == "-" ? (-1) : 1);
 
@@ -101,7 +101,7 @@ let subtractInterval: (t, Interval.t) => t =
 
       key: {
         ...convertedPitch.key,
-        accidental: Accidental.make(`IntegerLiteral(diff)),
+        accidental: Accidental.makeWithInteger(diff),
       },
     };
   };
@@ -127,7 +127,7 @@ let addInterval = (pitch: t, interval: Interval.t) => {
     ...convertedPitch,
     key: {
       ...convertedPitch.key,
-      accidental: Accidental.initializeWithInteger(diff),
+      accidental: Accidental.makeWithInteger(diff),
     },
   };
 };

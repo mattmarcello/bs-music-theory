@@ -13,7 +13,7 @@ let makeWithStringLiteral = str => {
   ) {
   | Some([_, Some(keyTypeString), Some(accidentalString)]) => {
       type_: KeyType.ofString(keyTypeString),
-      accidental: Accidental.ofString(accidentalString),
+      accidental: Accidental.makeWithString(accidentalString),
     }
 
   | _ => {type_: C, accidental: Natural}
@@ -80,7 +80,7 @@ let equal = (k', k'') => {
 
 
 let toString = ({type_, accidental}) => {
-  KeyType.toString(type_) ++ " " ++ Accidental.toString(accidental);
+  KeyType.toString(type_) ++ " " ++ Accidental.notation(accidental);
 };
 
 let normalizedIntValue = k => {

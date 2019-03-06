@@ -7,7 +7,6 @@ module ScalePitch = {
 
   type scale = t;
 
-
   type t = Model.Pitch.t;
 
   let rawValue = ({key, octave}: t) => {
@@ -59,7 +58,7 @@ module ScalePitch = {
       ...convertedPitch,
       key: {
         ...convertedPitch.key,
-        accidental: Accidental.initializeWithInteger(diff),
+        accidental: Accidental.makeWithInteger(diff),
       },
     };
   };

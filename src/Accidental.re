@@ -1,6 +1,6 @@
-include Model.Accidental;
+type t = Model.Accidental.t = | Natural | Flats(int) | Sharps(int);
 
-let makeWithInteger = i =>
+let makeWithRawValue = i =>
   if (i == 0) {
     Natural;
   } else if (i > 0) {
@@ -9,15 +9,19 @@ let makeWithInteger = i =>
     Flats(Js.Math.abs_int(i));
   };
 
-let makeWithStringLiteral = str => {
+let makeWithInteger = makeWithRawValue;
+
+let makeWithString = str => {
   Js.String.split("", str)
   ->Belt.Array.reduce(0, (acc, curr) =>
       switch (curr) {
       | "#" => acc + 1
-      /*
-          Can't pattern match on unicode
 
-       | {"♯"} => acc + 1 */
+      /*
+       TODO:
+               Can't pattern match on unicode
+
+            | {"♯"} => acc + 1 */
       | "b" => acc - 1
 
       /*
@@ -30,13 +34,35 @@ let makeWithStringLiteral = str => {
   |> makeWithInteger;
 };
 
-let make =
+let rawValue =
   fun
-  | `RawValue(i)
-  | `IntegerLiteral(i) => makeWithInteger(i)
-  | `StringLiteral(s) => makeWithStringLiteral(s);
+  | Natural => 0
+  | Flats(i) => - i
+  | Sharps(i) => i;
 
-let ofString = str => make(`StringLiteral(str));
+let add = (a', a'') => makeWithInteger(a'->rawValue + a''->rawValue);
+
+let subtract = (a', a'') => makeWithInteger(a'->rawValue - a''->rawValue);
+
+let addInt = (a, i) => makeWithInteger(a->rawValue + i);
+
+let subtractInt = (a, i) => makeWithInteger(a->rawValue - i);
+
+let multiplyInt = (a, i) => makeWithInteger(a->rawValue * i);
+
+let divideInt = (a, i) => makeWithInteger(a->rawValue / i);
+
+let equals = (a', a'') => a'->rawValue == a''->rawValue;
+
+let equalsStrict = (a', a'') =>
+  switch (a', a'') {
+  | (Natural, Natural) => true
+  | (Sharps(a), Sharps(b)) when a == b => true
+  | (Flats(a), Flats(b)) when a == b => true
+  | _ => false
+  };
+
+let natural = Natural;
 
 let flat = Flats(1);
 let sharp = Sharps(1);
@@ -44,56 +70,23 @@ let sharp = Sharps(1);
 let doubleFlat = Flats(2);
 let doubleSharp = Sharps(2);
 
-let natural = Natural;
-
 let flats = i => Flats(i);
-
 let sharps = i => Sharps(i);
-
-let rawValue =
-  fun
-  | Natural => 0
-  | Flats(i) => - i
-  | Sharps(i) => i;
-
-/***
- * TODO: convert to make with variant API
- */
-let initializeWithInteger = i =>
-  switch (i) {
-  | 0 => Natural
-  | i when i < 0 => Flats(- i)
-  | _ => Sharps(i)
-  };
-
-let add = (a', a'') => initializeWithInteger(a'->rawValue + a''->rawValue);
-
-let subtract = (a', a'') =>
-  initializeWithInteger(a'->rawValue - a''->rawValue);
-
-let addInt = (a, i) => initializeWithInteger(a->rawValue + i);
-
-let subtractInt = (a, i) => initializeWithInteger(a->rawValue - i);
-
-let multiplyInt = (a, i) => initializeWithInteger(a->rawValue * i);
-
-let divideInt = (a, i) => initializeWithInteger(a->rawValue / i);
-
-//* TODO: doesn't support double sharp / double flat notation */
 
 let description =
   fun
   | Natural => ""
   | Flats(amount) => Js.String.repeat(amount, "b")
   | Sharps(amount) => {
-	  
-	  Js.String.repeat(amount, "#");
-  }
-
+      Js.String.repeat(amount, "#");
+    };
 
 let notation =
   fun
   | Natural => "♮"
   | type_ => description(type_);
 
-let toString = notation
+
+module Infix = {
+
+}

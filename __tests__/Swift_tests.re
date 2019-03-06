@@ -698,3 +698,4 @@ test("inversions", () => {
     |> toEqual(c7Inversions)
   );
 });
+
