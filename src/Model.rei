@@ -84,7 +84,7 @@ module HarmonicField: {
     | Eleventh
     | Thirteenth;
 };
-module Interval_Quality: {
+module IntervalQuality: {
   type t =
     | Diminished
     | Perfect
@@ -94,7 +94,7 @@ module Interval_Quality: {
 };
 module Interval: {
   type t = {
-    quality: Interval_Quality.t,
+    quality: IntervalQuality.t,
     degree: int,
     semitones: int,
   };

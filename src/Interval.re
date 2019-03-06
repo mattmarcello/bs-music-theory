@@ -1,33 +1,32 @@
-include Model.Interval;
+type t =
+  MusicTheory.Model.Interval.t = {
+    quality: MusicTheory.Model.IntervalQuality.t,
+    degree: int,
+    semitones: int,
+  };
 
-let equal = (i', i'') => i'.semitones == i''.semitones;
-
-//TODO: have consistent format for math operators
-
-// TODO: move and hide behind rei file addAcccidental defined originally defined in Chord.swift as an extension
-
-let addAccidental = (interval: t, accidental: Accidental.t) => {
-  interval.semitones + accidental->Accidental.rawValue;
+let make =
+    (
+      ~quality: MusicTheory.Model.IntervalQuality.t,
+      ~degree: int,
+      ~semitones: int,
+    ) => {
+  quality,
+  degree,
+  semitones,
 };
 
-// TODO: remove
-let qualityToString =
-  fun
-  | Interval_Quality.Perfect => "perfect"
-  | Diminished => "diminished"
-  | Minor => "minor"
-  | Major => "major"
-  | Augmented => "augmented";
+let equals = (i', i'') => i'.semitones == i''.semitones;
 
-let toString = ({quality, degree, semitones}) => {
-  qualityToString(quality)
-  ++ " "
-  ++ string_of_int(degree)
-  ++ " "
-  ++ string_of_int(semitones);
+let equalsStrict = Pervasives.(==);
+
+let notation = ({quality, degree}) => {
+  IntervalQuality.notation(quality) ++ string_of_int(degree);
 };
 
-let description = toString;
+let description  = ({quality, degree}) => {
+  IntervalQuality.notation(quality) ++ " " ++ string_of_int(degree);
+};
 
 let perfect1 = {quality: Perfect, degree: 1, semitones: 0};
 let perfect4 = {quality: Perfect, degree: 4, semitones: 5};
@@ -103,7 +102,6 @@ let all = [
   minor10,
   minor13,
   minor14,
-
   major2,
   major3,
   major6,
@@ -112,7 +110,6 @@ let all = [
   major10,
   major13,
   major14,
-
   diminished1,
   diminished2,
   diminished3,
@@ -128,7 +125,6 @@ let all = [
   diminished13,
   diminished14,
   diminished15,
-
   augmented1,
   augmented2,
   augmented3,
@@ -145,3 +141,8 @@ let all = [
   augmented14,
   augmented15,
 ];
+
+module Infix = {
+  let (==) = equals;
+  let (===) = equalsStrict;
+};

@@ -2,7 +2,7 @@ module ChordThirdType:
   {
     type t = MusicTheory.Model.ChordThirdType.t = Major | Minor;
     let makeWithInterval: MusicTheory.Model.Interval.t => option(t);
-    let interval: t => MusicTheory.Interval.t;
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
     let all: list(t);
@@ -14,8 +14,8 @@ module ChordFifthType:
         Perfect
       | Diminished
       | Augmented;
-    let makeWithInterval: MusicTheory.Interval.t => option(t);
-    let interval: t => MusicTheory.Interval.t;
+    let makeWithInterval: MusicTheory.Model.Interval.t => option(t);
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
     let all: list(t);
@@ -23,8 +23,8 @@ module ChordFifthType:
 module ChordSixthType:
   {
     type t = MusicTheory.Model.ChordSixthType.t = Sixth;
-    let makeWithInterval: MusicTheory.Interval.t => option(t);
-    let interval: t => MusicTheory.Interval.t;
+    let makeWithInterval: MusicTheory.Model.Interval.t => option(t);
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
   };
@@ -35,8 +35,8 @@ module ChordSeventhType:
         Major
       | Dominant
       | Diminished;
-    let makeWithInterval: MusicTheory.Interval.t => option(t);
-    let interval: t => MusicTheory.Interval.t;
+    let makeWithInterval: MusicTheory.Model.Interval.t => option(t);
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
     let all: list(t);
@@ -44,8 +44,8 @@ module ChordSeventhType:
 module ChordSuspendedType:
   {
     type t = MusicTheory.Model.ChordSuspendedType.t = Sus2 | Sus4;
-    let makeWithInterval: MusicTheory.Interval.t => option(t);
-    let interval: t => MusicTheory.Interval.t;
+    let makeWithInterval: MusicTheory.Model.Interval.t => option(t);
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
     let all: list(t);
@@ -60,7 +60,7 @@ module ChordExtensionType:
           | Eleventh
           | Thirteenth;
         let rawValue: t => int;
-        let interval: t => MusicTheory.Interval.t;
+        let interval: t => MusicTheory.Model.Interval.t;
         let notation: t => string;
         let description: t => string;
         let all: list(t);
@@ -73,9 +73,9 @@ module ChordExtensionType:
     };
     let make:
       (~type_: MusicTheory.Model.ExtensionType.t,
-      ~accidental: MusicTheory.Accidental.t=?, unit) => t;
-    let makeWithInterval: MusicTheory.Interval.t  => option(t);
-    let interval: t => MusicTheory.Interval.t;
+      ~accidental: MusicTheory.Model.Accidental.t=?, unit) => t;
+    let makeWithInterval: MusicTheory.Model.Interval.t  => option(t);
+    let interval: t => MusicTheory.Model.Interval.t;
     let notation: t => string;
     let description: t => string;
     let all: Belt.List.t(t);
@@ -89,13 +89,13 @@ type t =
   suspended: option(MusicTheory.Model.ChordSuspendedType.t),
   extensions: option(list(MusicTheory.Model.ChordExtensionType.t)),
 };
-let makeWithIntervals: list(MusicTheory.Interval.t) => option(t);
+let makeWithIntervals: list(MusicTheory.Model.Interval.t) => option(t);
 let make:
   (~third: ChordThirdType.t, ~fifth: ChordFifthType.t=?,
   ~sixth: ChordSixthType.t=?, ~seventh: ChordSeventhType.t=?,
   ~suspended: ChordSuspendedType.t=?,
   ~extensions: list(ChordExtensionType.t)=?, unit) => t;
-let intervals: t => Belt.List.t(MusicTheory.Interval.t);
+let intervals: t => Belt.List.t(MusicTheory.Model.Interval.t);
 let notation: t => string;
 let description: t => string;
 let all: list(t);
