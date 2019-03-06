@@ -12,10 +12,6 @@ module ChordThirdType = {
       );
     };
 
-  let make =
-    fun
-    | `Interval(interval) => makeWithInterval(interval);
-
   let interval =
     fun
     | Major => Interval.major3
@@ -48,10 +44,6 @@ module ChordFifthType = {
         }
       );
     };
-
-  let make =
-    fun
-    | `Interval(interval) => makeWithInterval(interval);
 
   let interval =
     fun
@@ -87,10 +79,6 @@ module ChordSixthType = {
       );
     };
 
-  let make =
-    fun
-    | `Interval(interval) => makeWithInterval(interval);
-
   let interval =
     fun
     | Sixth => Interval.major6;
@@ -118,10 +106,6 @@ module ChordSeventhType = {
         }
       );
     };
-
-  let make =
-    fun
-    | `Interval(interval) => makeWithInterval(interval);
 
   let interval =
     fun
@@ -157,10 +141,6 @@ module ChordSuspendedType = {
         }
       );
     };
-
-  let make =
-    fun
-    | `Interval(interval) => makeWithInterval(interval);
 
   let interval =
     fun
@@ -214,11 +194,11 @@ module ChordExtensionType = {
   include Model.ChordExtensionType;
 
   //TODO: consider renaming this
-  let makeWithType =
+  let make =
       (~type_: Model.ExtensionType.t, ~accidental=Accidental.Natural, ()) => {
     type_,
     accidental,
-    isAdded: false,
+    isAdded: false //TODO: remove isAdded,
   };
 
   // TODO: move and hide behind rei file addAcccidental defined originally defined in Chord.swift as an extension
@@ -227,7 +207,7 @@ module ChordExtensionType = {
   /*   interval.semitones + accidental->Accidental.rawValue; */
   /* }; */
 
-  let makeWithInterval = (~interval: Interval.t, ()) => {
+  let makeWithInterval = (interval: Interval.t) => {
     switch (interval.semitones) {
     /* ExtensionType.ninth.interval (14) + Accidental.natural (0) */
     | 14 =>
@@ -259,17 +239,6 @@ module ChordExtensionType = {
     | 22 =>
       Some({type_: Thirteenth, accidental: Accidental.sharp, isAdded: false})
     | _ => None
-    };
-  };
-
-  let make = (~type_=?, ~accidental=Accidental.natural, ~interval=?, ()) => {
-    switch (type_, interval) {
-    | (Some(type_), _) => Some(makeWithType(~type_, ~accidental, ()))
-    | (None, Some(interval)) => makeWithInterval(~interval, ())
-    | _ =>
-      Exception.Make("in Chord.make: must supply one of [ type_, interval ]")
-      |> ignore;
-      assert(false);
     };
   };
 
@@ -306,9 +275,9 @@ module ChordExtensionType = {
   let all =
     ExtensionType.all->Belt.List.reduce([], (acc, type_) =>
       acc->Belt.List.concat([
-        make(~type_, ~accidental=Accidental.natural, ())->Belt.Option.getExn,
-        make(~type_, ~accidental=Accidental.flat, ())->Belt.Option.getExn,
-        make(~type_, ~accidental=Accidental.sharp, ())->Belt.Option.getExn,
+        make(~type_, ~accidental=Accidental.natural, ()),
+        make(~type_, ~accidental=Accidental.flat, ()),
+        make(~type_, ~accidental=Accidental.sharp, ()),
       ])
     );
 };
@@ -327,32 +296,32 @@ let makeWithIntervals: list(Interval.t) => option(t) =
     let extensions = ref(None);
 
     intervals->Belt.List.forEach(interval => {
-      let maybeThird = ChordThirdType.make(`Interval(interval));
+      let maybeThird = ChordThirdType.makeWithInterval(interval);
       if (maybeThird->Belt.Option.isSome) {
         third := maybeThird;
       };
 
-      let maybeFifth = ChordFifthType.make(`Interval(interval));
+      let maybeFifth = ChordFifthType.makeWithInterval(interval);
       if (maybeFifth->Belt.Option.isSome) {
         fifth := maybeFifth;
       };
 
-      let maybeSixth = ChordSixthType.make(`Interval(interval));
+      let maybeSixth = ChordSixthType.makeWithInterval(interval);
       if (maybeSixth->Belt.Option.isSome) {
         sixth := maybeSixth;
       };
 
-      let maybeSeventh = ChordSeventhType.make(`Interval(interval));
+      let maybeSeventh = ChordSeventhType.makeWithInterval(interval);
       if (maybeSeventh->Belt.Option.isSome) {
         seventh := maybeSeventh;
       };
 
-      let maybeSuspended = ChordSuspendedType.make(`Interval(interval));
+      let maybeSuspended = ChordSuspendedType.makeWithInterval(interval);
       if (maybeSuspended->Belt.Option.isSome) {
         suspended := maybeSuspended;
       };
 
-      let maybeExtension = ChordExtensionType.make(~interval, ());
+      let maybeExtension = ChordExtensionType.makeWithInterval(interval);
 
       if (maybeExtension->Belt.Option.isSome) {
         switch (extensions^) {
@@ -403,8 +372,7 @@ let make =
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,
           (),
-        )
-        ->Belt.Option.getExn,
+        ),
         extension,
       ])
 
@@ -414,13 +382,11 @@ let make =
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Ninth,
           (),
-        )
-        ->Belt.Option.getExn,
+        ),
         ChordExtensionType.make(
           ~type_=ChordExtensionType.ExtensionType.Eleventh,
           (),
-        )
-        ->Belt.Option.getExn,
+        ),
         extension,
       ])
 
@@ -665,3 +631,10 @@ let equals = (c': option(t), c'': option(t)): bool => {
   | _ => false
   };
 };
+
+module Infix = {
+	let (==) = equals;
+
+
+}
+

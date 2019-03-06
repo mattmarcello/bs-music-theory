@@ -390,7 +390,6 @@ testAll(
                   ~type_=ChordType.ChordExtensionType.ExtensionType.Thirteenth,
                   (),
                 )
-                ->Belt.Option.getExn //TODO: this is a horrible API ,
               ],
               (),
             ),
@@ -430,7 +429,6 @@ testAll(
                   ~type_=ChordType.ChordExtensionType.ExtensionType.Thirteenth,
                   (),
                 )
-                ->Belt.Option.getExn //TODO: this is a horrible API ,
               ],
               (),
             ),
@@ -481,7 +479,6 @@ testAll(
                   ~type_=ChordType.ChordExtensionType.ExtensionType.Thirteenth,
                   (),
                 )
-                ->Belt.Option.getExn //TODO: this is a horrible API ,
               ],
               (),
             ),

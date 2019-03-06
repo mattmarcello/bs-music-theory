@@ -9,8 +9,8 @@ let equals: (option(t), option(t)) => bool;
 
 let make:
   (
-    ~type_: MusicTheory.ChordType.t,
-    ~key: MusicTheory.Key.t,
+    ~type_: MusicTheory.Model.ChordType.t,
+    ~key: MusicTheory.Model.Key.t,
     ~inversion: int=?,
     unit
   ) =>
@@ -19,13 +19,13 @@ let make:
 let pitches: (t, ~octave: int, unit) => list(MusicTheory.Model.Pitch.t);
 
 let pitchesWithOctaves:
-  (t, ~octaves: list(int), unit) => list(MusicTheory.Pitch.t);
+  (t, ~octaves: list(int), unit) => list(MusicTheory.Model.Pitch.t);
 
-let keys: t => list(MusicTheory.Key.t);
+let keys: t => list(MusicTheory.Model.Key.t);
 
 let inversions: t => Belt.List.t(t);
 
-let romanNumeric: (t, ~for_: MusicTheory.Scale.t) => option(Js.String.t);
+let romanNumeric: (t, ~for_: MusicTheory.Model.Scale.t) => option(Js.String.t);
 
 let notation: t => string;
 
