@@ -1,4 +1,10 @@
-include Model.HarmonicField;
+type t =
+  MusicTheory.Model.HarmonicField.t =
+    Triad
+  | Tetrad
+  | Ninth
+  | Eleventh
+  | Thirteenth;
 
 let all = [Triad, Tetrad, Ninth, Eleventh, Thirteenth];
 

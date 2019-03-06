@@ -1,11 +1,15 @@
-include Model.Chord;
+type t =
+  Model.Chord.t = {
+    type_: Model.ChordType.t,
+    key: Model.Key.t,
+    inversion: int,
+  };
 
 let make = (~type_: ChordType.t, ~key: Key.t, ~inversion: int=0, ()): t => {
   type_,
   key,
   inversion,
 };
-
 
 let equals = (t': option(t), t'': option(t)) => {
   switch (t', t'') {
@@ -15,7 +19,6 @@ let equals = (t': option(t), t'': option(t)) => {
   };
 };
 
-
 let pitches =
     ({type_, key, inversion}, ~octave: int, ()): list(Model.Pitch.t) => {
   let shifted =
@@ -24,7 +27,6 @@ let pitches =
     | l => l;
 
   let intervals = ref(type_->ChordType.intervals);
-
 
   for (_ in 0 to inversion - 1) {
     intervals := (intervals^)->shifted;
@@ -161,6 +163,5 @@ let description = ({type_, key, inversion}) => {
 };
 
 module Infix = {
-	let (==) = equals;
-
-}
+  let (==) = equals;
+};
