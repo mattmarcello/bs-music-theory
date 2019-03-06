@@ -88,5 +88,12 @@ let notation =
 
 
 module Infix = {
-
-}
+  let (+) = add;
+  let (-) = subtract;
+  let (++) = addInt;
+  let (--) = subtractInt;
+  let (/) = divideInt;
+  let (*) = multiplyInt;
+  let (==) = equals;
+  let (===) = equalsStrict;
+};
