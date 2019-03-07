@@ -34,19 +34,19 @@ module ScalePitch = {
   let addInterval = (pitch: t, interval: Interval.t) => {
     let degree = interval.degree - 1;
 
-    let targetKeyType = pitch.key.type_->KeyType.atDistance(degree);
+    let targetKeyType = pitch.key.type_->KeyType.key(~at=degree);
 
     let targetPitch = pitch->addHalfstep(interval.semitones);
 
     let targetOctave =
       pitch.octave
-      + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
+      + pitch.key.type_->KeyType.octaveDiff(~for_=interval, ~isHigher=true );
 
     //convert pitch
 
     let convertedPitch =
       Model.Pitch.{
-        key: Key.makeWithType(~type_=targetKeyType, ()),
+        key: Key.make(~type_=targetKeyType, ()),
         octave: targetOctave,
       };
 

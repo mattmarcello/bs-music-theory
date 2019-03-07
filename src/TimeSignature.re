@@ -1,7 +1,7 @@
 include Model.TimeSignature;
 
 let makeWithBeatsAndDivision = (beats, division) => {
-  let noteValue = NoteValueType.make(`FloatLiteral(division));
+  let noteValue = NoteValueType.makeWithFloat(division);
   switch (noteValue) {
   | Some(noteValue) => Some({beats, noteValue})
   | None => None

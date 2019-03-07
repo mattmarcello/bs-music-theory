@@ -1,9 +1,8 @@
 include Model.Pitch;
 
-//* TODO: maybe it would be good to make this nicer */
 
 let toString = ({key, octave} : t ) => {
-  key->Key.toString ++ string_of_int(octave);
+  key->Key.description  ++ string_of_int(octave);
 };
 
 let rawValue = ({key, octave}: t ) => {
@@ -46,7 +45,7 @@ let makeWithStringLiteral = (str: string) : t  => {
       Some(signString),
       Some(octaveString),
     ]) =>
-    let keyType = KeyType.make(`StringLiteral(keyTypeString));
+    let keyType = KeyType.makeWithString((keyTypeString));
 
     let accidental = Accidental.makeWithString(accidentalString);
 
@@ -60,7 +59,7 @@ let makeWithStringLiteral = (str: string) : t  => {
       octave,
     };
 
-  | _ => {key: Key.make(`StringLiteral("C")), octave: 0}
+  | _ => {key: Key.makeWithString("c"), octave: 0}
   };
 };
 
@@ -81,17 +80,17 @@ let subtractHalfstep: (t, int) => t =
 let subtractInterval: (t, Interval.t) => t =
   (pitch, interval) => {
     let degree = - (interval.degree - 1);
-    let targetKeyType = pitch.key.type_->KeyType.atDistance(degree);
+    let targetKeyType = pitch.key.type_->KeyType.key(~at=degree);
     let targetPitch = pitch->subtractHalfstep(interval.semitones);
 
     let targetOctave =
       pitch.octave
-      + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
+      + pitch.key.type_->KeyType.octaveDiff(~for_=interval, ~isHigher=true);
 
     // convert pitch
 
     let convertedPitch :  t = {
-      key: Key.make(`Type(targetKeyType)),
+      key: Key.make(~type_=targetKeyType, ()),
       octave: targetOctave,
     };
     let diff = targetPitch->rawValue - convertedPitch->rawValue;
@@ -108,16 +107,16 @@ let subtractInterval: (t, Interval.t) => t =
 
 let addInterval = (pitch: t, interval: Interval.t) => {
   let degree = interval.degree - 1;
-  let targetKeyType = pitch.key.type_->KeyType.atDistance(degree);
+  let targetKeyType = pitch.key.type_->KeyType.key(~at=degree);
   let targetPitch = pitch->addHalfstep(interval.semitones);
   let targetOctave =
     pitch.octave
-    + pitch.key.type_->KeyType.octaveDiff(interval, Octave.Higher);
+    + pitch.key.type_->KeyType.octaveDiff(~for_=interval, ~isHigher=true);
 
   //convert pitch
 
   let convertedPitch : t = {
-    key: Key.makeWithType(~type_=targetKeyType, ()),
+    key: Key.make(~type_=targetKeyType, ()),
     octave: targetOctave,
   };
 

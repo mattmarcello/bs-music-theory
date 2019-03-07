@@ -1,44 +1,22 @@
-include Model.KeyType;
+type t = MusicTheory.Model.KeyType.t = | C | D | E | F | G | A | B;
 
-let make =
+let makeWithString =
   fun
-  | `StringLiteral(str) => {
-
-
-    switch (str) {
-    | "c"
-    | "C" => C
-    | "d"
-    | "D" => D
-    | "e"
-    | "E" => E
-    | "f"
-    | "F" => F
-    | "g"
-    | "G" => G
-    | "a"
-    | "A" => A
-    | "b"
-    | "B" => B
-    | _ => assert(false)
-    };
-
-	  }
-
-let ofString =  str => make(`StringLiteral(str))
-
-/* let makeWithStringLiteral = str => { */
-/*   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)"); */
-
-/*   switch (str->Js.Re.exec(pattern)) { */
-/*   | Some(match) when match->Js.Re.captures->Belt.Array.length == 3 => */
-/*     let [_, key, accidental] = match->Js.Re.captures->Belt.List.fromArray; */
-
-/*     D; */
-/*   | _ => D */
-/*   }; */
-/* }; */
-
+  | "c"
+  | "C" => C
+  | "d"
+  | "D" => D
+  | "e"
+  | "E" => E
+  | "f"
+  | "F" => F
+  | "g"
+  | "G" => G
+  | "a"
+  | "A" => A
+  | "b"
+  | "B" => B
+  | _ => assert(false);
 
 let rawValue =
   fun
@@ -52,49 +30,21 @@ let rawValue =
 
 let all = [C, D, E, F, G, A, B];
 
-/**
-  * TODO: refactor to at(~degree)
-  */
+let key = (key, ~at as distance: int) : t => {
+  let index = Util.indexOf(all, key)->Belt.Option.getExn;
 
-let toString =
-  fun
-  | C => "C"
-  | D => "D"
-  | E => "E"
-  | F => "F"
-  | G => "G"
-  | A => "A"
-  | B => "B";
+  let normalizedDistance = (index + distance) mod Belt.List.length(all);
 
-let atDistance: (t, int) => t =
-  (key, distance) => {
+  let keyIndex =
+    normalizedDistance < 0 ?
+      Belt.List.length(all) + normalizedDistance : normalizedDistance;
 
-     /* Js.log("at distance"); */
+  Belt.List.getExn(all, keyIndex);
+};
 
-     /* Js.log2("key", key -> toString); */
-
-     /* Js.log2("distance", distance); */
-
-    let index = Util.indexOf(all, key)->Belt.Option.getExn;
-
-    /* Js.log2("index", index ); */
-
-    let normalizedDistance = (index + distance) mod Belt.List.length(all);
-
-    /* Js.log2("normalizedDistance", normalizedDistance  ); */
-
-    let keyIndex =
-      normalizedDistance < 0 ?
-        Belt.List.length(all) + normalizedDistance : normalizedDistance;
-
-    /* Js.log2("keyIndex ", keyIndex   ); */
-
-    Belt.List.getExn(all, keyIndex);
-  };
-
-let distanceFrom = (key, target) => {
+let distance = (key, ~from as keyType: t) => {
   let index' = all->Util.indexOf(key);
-  let index'' = all->Util.indexOf(target);
+  let index'' = all->Util.indexOf(keyType);
 
   switch (index', index'') {
   | (Some(index'), Some(index'')) => index'' - index'
@@ -102,30 +52,22 @@ let distanceFrom = (key, target) => {
   };
 };
 
-
-let description = toString;
-
-
-//TODO: refactor this API
-let octaveDiff: (t, Interval.t, Octave.t) => int =
-  (key, interval: Interval.t, octave) => {
-
+let octaveDiff =
+  (t, ~for_ as interval: Interval.t, ~isHigher) => {
     let diff = ref(0);
-    let currentKey = ref(key);
+    let currentKey : ref(t) = ref(t);
 
     for (_ in 0 to interval.degree - 2) {
-
       let next =
-        switch (octave) {
-        | Octave.Higher => currentKey^ -> atDistance(1)
-        | Lower => currentKey^ -> atDistance(-1)
-        };
+	      isHigher ?
+        (currentKey^ : t)->key(~at=1)
+        : (currentKey^)->key(~at=-1);
 
       diff :=
         (
-          switch (octave, currentKey^, next) {
-          | (Octave.Higher, B, C) => diff^ + 1
-          | (Octave.Lower, C, B) => diff^ - 1
+          switch (isHigher, currentKey^, next) {
+          | (true, B, C) => diff^ + 1
+          | (false, C, B) => diff^ - 1
           | _ => diff^
           }
         );
@@ -135,3 +77,15 @@ let octaveDiff: (t, Interval.t, Octave.t) => int =
 
     diff^;
   };
+
+
+let description  =
+  fun
+  | C => "C"
+  | D => "D"
+  | E => "E"
+  | F => "F"
+  | G => "G"
+  | A => "A"
+  | B => "B";
+

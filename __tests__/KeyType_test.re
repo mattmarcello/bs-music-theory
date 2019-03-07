@@ -15,7 +15,7 @@ testAll(
     (F, (-3), C),
   ],
   ((key, distance, expectedKey)) =>
-  atDistance(key, distance) == expectedKey ? pass : fail("")
+  KeyType.key(key, ~at=distance) == expectedKey ? pass : fail("")
 );
 
 testAll(
@@ -30,9 +30,7 @@ testAll(
     (F, C, (-3)),
   ],
   ((key', key'', distance)) =>
-  distanceFrom(key', key'') == distance ? pass : fail("")
+  KeyType.distance(key', ~from=key'') == distance ? pass : fail("")
 );
-
-
 
 Skip.test("octaveDiff");

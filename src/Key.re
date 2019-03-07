@@ -1,9 +1,17 @@
-include Model.Key;
+type t =
+  MusicTheory.Model.Key.t = {
+    type_: MusicTheory.Model.KeyType.t,
+    accidental: MusicTheory.Model.Accidental.t,
+  };
 
-let makeWithStringLiteral = str => {
+let make = (~type_, ~accidental=Accidental.Natural, ()) => {
+  type_,
+  accidental,
+};
+
+let makeWithString = str => {
   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)");
 
-  //TODO: rewrite this to be nicer
   switch (
     str
     ->Js.Re.exec(pattern)
@@ -12,7 +20,7 @@ let makeWithStringLiteral = str => {
     ->Belt.Option.map(l => l->Belt.List.map(Js.Nullable.toOption))
   ) {
   | Some([_, Some(keyTypeString), Some(accidentalString)]) => {
-      type_: KeyType.ofString(keyTypeString),
+      type_: KeyType.makeWithString(keyTypeString),
       accidental: Accidental.makeWithString(accidentalString),
     }
 
@@ -20,15 +28,21 @@ let makeWithStringLiteral = str => {
   };
 };
 
-let makeWithType = (~type_, ~accidental=Accidental.Natural, ()) => {
-  type_,
-  accidental,
+let equals = (k', k'') => {
+  let k'mod =
+    ((k'.type_ |> KeyType.rawValue) + (k'.accidental |> Accidental.rawValue))
+    mod 12;
+  let normalizedK' = k'mod < 0 ? 12 + k'mod : k'mod;
+
+  let k''mod =
+    ((k''.type_ |> KeyType.rawValue) + (k''.accidental |> Accidental.rawValue))
+    mod 12;
+  let normalizedK'' = k''mod < 0 ? 12 + k''mod : k''mod;
+
+  normalizedK' == normalizedK'';
 };
 
-let make =
-  fun
-  | `Type(type_) => makeWithType(~type_=type_, ())
-  | `StringLiteral(str) => makeWithStringLiteral(str);
+let equalsStrict = Pervasives.(==);
 
 let keysWithSharps = [
   {type_: KeyType.C, accidental: Accidental.natural},
@@ -60,44 +74,11 @@ let keysWithFlats = [
   {type_: B, accidental: Accidental.natural},
 ];
 
-/* math and equality operators */
-
-let equal = (k', k'') => {
-  let k'mod =
-    ((k'.type_ |> KeyType.rawValue) + (k'.accidental |> Accidental.rawValue))
-    mod 12;
-  let normalizedK' = k'mod < 0 ? ( 12 + k'mod ) : k'mod;
-
-  let k''mod =
-    ((k''.type_ |> KeyType.rawValue) + (k''.accidental |> Accidental.rawValue))
-    mod 12;
-  let normalizedK'' = k''mod < 0 ? ( 12 + k''mod ) : k''mod;
-
-  normalizedK' == normalizedK''
+let description = ({type_, accidental}) => {
+  KeyType.description(type_) ++ " " ++ Accidental.notation(accidental);
 };
 
-/* end math and equality operators */
-
-
-let toString = ({type_, accidental}) => {
-  KeyType.toString(type_) ++ " " ++ Accidental.notation(accidental);
+module Infix = {
+  let (==) = equals;
+  let (===) = equalsStrict;
 };
-
-let normalizedIntValue = k => {
-  let kmod =
-    (k.type_->KeyType.rawValue + k.accidental->Accidental.rawValue) mod 12;
-  /* Js.log3("kmod", k.type_ -> KeyType.rawValue */
-
-  kmod < 0 ? kmod + 12 : kmod;
-};
-
-let intEqual = (k', k'') => {
-  normalizedIntValue(k') == normalizedIntValue(k'');
-};
-
-let description = ({ type_, accidental }) => type_ -> KeyType.description ++ accidental -> Accidental.description
-
-
-/* let intValueEqual = (k', k'') => { */
-
-/* } */

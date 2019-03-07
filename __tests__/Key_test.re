@@ -4,11 +4,11 @@ testAll(
   "make with string literal",
   [
     (
-      Key.make(`StringLiteral("a##b")),
+      Key.makeWithString("a##b"),
       Key.{type_: A, accidental: Sharps(1)},
     ),
     (
-      Key.make(`StringLiteral("a#")),
+      Key.makeWithString("a#"),
       Key.{type_: A, accidental: Sharps(1)},
     ),
   ],
@@ -27,6 +27,6 @@ testAll(
   actual => {
     let b = Key.{type_: B, accidental: Natural};
 
-    Key.equal(b, actual ) ? pass : fail("")
+    Key.equals(b, actual ) ? pass : fail("")
   },
 );

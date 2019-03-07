@@ -2,7 +2,7 @@ open Jest;
 
 describe("pitch", () => {
   test("sanity", () => {
-    let key = Key.makeWithType(~type_=C, ());
+    let key = Key.make(~type_=C, ());
 
     let pitch = Pitch.{key, octave: 1};
 
@@ -36,31 +36,31 @@ describe("pitch", () => {
 
   test("add halfstep", () => {
     let pitch =
-      {key: Key.makeWithType(~type_=C, ()), octave: 1}
+      {key: Key.make(~type_=C, ()), octave: 1}
       ->Pitch.addHalfstep(1);
 
     let actual = pitch.key;
 
     let expected = Key.{type_: C, accidental: Accidental.sharp};
 
-    Key.intEqual(actual, expected) ? pass : fail("");
+    Key.equals(actual, expected) ? pass : fail("");
   });
 
   test("subtract halfstep", () => {
     let pitch' =
-      Pitch.{key: Key.makeWithType(~type_=C, ()), octave: 1}
+      Pitch.{key: Key.make(~type_=C, ()), octave: 1}
       ->Pitch.subtractHalfstep(1);
 
-    let pitch'' = Pitch.{key: Key.makeWithType(~type_=B, ()), octave: 0};
+    let pitch'' = Pitch.{key: Key.make(~type_=B, ()), octave: 0};
 
     Expect.(expect(pitch') |> toEqual(pitch''));
   });
 
   test("subtractPitch", () => {
 
-    let c1 = Pitch.{key: Key.makeWithType(~type_=C, ()), octave: 1};
+    let c1 = Pitch.{key: Key.make(~type_=C, ()), octave: 1};
 
-    let d1  = Pitch.{key: Key.makeWithType(~type_=D, ()), octave: 1};
+    let d1  = Pitch.{key: Key.make(~type_=D, ()), octave: 1};
 
     let actual = d1->Pitch.subtractPitch(c1);
 

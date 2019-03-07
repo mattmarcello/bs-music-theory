@@ -123,11 +123,7 @@ module NoteValue: {
     modifier: NoteModifier.t,
   };
 };
-module Octave: {
-  type t =
-    | Higher
-    | Lower;
-};
+
 module Pitch: {
   type t = {
     key: Key.t,

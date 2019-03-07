@@ -1,0 +1,12 @@
+type t =
+  MusicTheory.Model.NoteValueType.t =
+    DoubleWhole
+  | Whole
+  | Half
+  | Quarter
+  | Eighth
+  | Sixteenth
+  | Thirtysecond
+  | Sixtyfourth;
+let rawValue: t => float;
+let makeWithFloat: float => option(t);
