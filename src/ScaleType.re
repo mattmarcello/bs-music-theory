@@ -1,4 +1,13 @@
-include Model.ScaleType;
+type t =
+  MusicTheory.Model.ScaleType.t = {
+    intervals: list(MusicTheory.Model.Interval.t),
+    description: string,
+  };
+
+let make = (~intervals: list(Interval.t), ~description: string="", ()): t => {
+  intervals,
+  description,
+};
 
 let ionian = {
   intervals:
@@ -447,3 +456,7 @@ let all = [
 ];
 
 let equals = (t', t'') => t'.intervals == t''.intervals;
+
+module Infix = {
+  let (==) = equals;
+};

@@ -4,6 +4,8 @@ type t =
     octave: int,
   };
 
+let make = (~key: Model.Key.t, ~octave: int) => {key, octave};
+
 let makeWithString = (str: string): t => {
   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)(-?)(\\d+)");
 
@@ -48,7 +50,8 @@ let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()): t => 
 
   {octave, key};
 };
-let makeWithRawValue = rawValue => makeWithMidiNote(~midiNote=rawValue, ());
+
+let makeWithInteger = rawValue => makeWithMidiNote(~midiNote=rawValue, ());
 
 let rawValue = ({key, octave}: t) => {
   let semitones =
@@ -58,7 +61,7 @@ let rawValue = ({key, octave}: t) => {
 
 let addHalfstep: (t, int) => t =
   (pitch, halfstep) => {
-    makeWithRawValue((pitch |> rawValue) + halfstep);
+    makeWithInteger((pitch |> rawValue) + halfstep);
   };
 
 let addInterval = (pitch: t, interval: Interval.t) => {
@@ -89,20 +92,12 @@ let addInterval = (pitch: t, interval: Interval.t) => {
 
 let subtractHalfstep: (t, int) => t =
   (pitch, halfstep) => {
-    makeWithRawValue((pitch |> rawValue) - halfstep);
+    makeWithInteger((pitch |> rawValue) - halfstep);
   };
 
 let toString = ({key, octave}: t) => {
   key->Key.description ++ string_of_int(octave);
 };
-
-let make =
-  fun
-  | `IntegerLiteral(i)
-  | `RawValue(i) => makeWithRawValue(i)
-  | `MidiNote(midiNote) => makeWithMidiNote(~midiNote, ())
-  | `StringLiteral(s) => makeWithString(s);
-
 
 let subtractInterval: (t, Interval.t) => t =
   (pitch, interval) => {
@@ -131,7 +126,6 @@ let subtractInterval: (t, Interval.t) => t =
       },
     };
   };
-
 
 let equal = (p', p'') => p'->rawValue == p''->rawValue;
 
@@ -165,34 +159,21 @@ let nearest = frequency' => {
   sorted->Belt.List.head->Belt.Option.map(fst);
 };
 
-module ScaleKeys = {
-  module B = Belt;
-
-  // TODO: rename this
-  let acrossOctaves = (~scale: Scale.t, ~octaves: list(int), ()) => {
-    octaves->B.List.reduce(
+let _keysForScale = (scale : Model.Scale.t ) : list(Model.Key.t)=> {
+  [1]
+  ->Belt.List.reduce(
       [],
       (acc, octave) => {
-        let root: t = {key: scale.key, octave};
+        let root = {key: scale.key, octave};
 
         let pitches =
           scale.type_.intervals
-          ->B.List.map(interval => {
-              let p = root->addInterval(interval);
+          ->Belt.List.map(interval => root->addInterval(interval));
 
-              p;
-            });
-
-        B.List.concat(acc, pitches);
+        Belt.List.concat(acc, pitches);
       },
-    );
-  };
-
-  let get: Scale.t => list(Key.t) =
-    scale => {
-      acrossOctaves(~scale, ~octaves=[1], ())
-      ->Belt.List.map(pitch => pitch.key);
-    };
+    )
+  ->Belt.List.map(pitch => pitch.key);
 };
 
 let subtractPitch: (t, t) => Interval.t =
@@ -221,9 +202,9 @@ let subtractPitch: (t, t) => Interval.t =
       | _ => false
       };
 
-    let majorScale: Scale.t = {type_: ScaleType.major, key: bottom.key};
+    let majorScale: Model.Scale.t = {type_: ScaleType.major, key: bottom.key};
 
-    ScaleKeys.get(majorScale)->Belt.List.has(top.key, (==)) ?
+    _keysForScale(majorScale)->Belt.List.has(top.key, (==)) ?
       {
         Interval.{quality: isMajor ? Major : Perfect, degree, semitones: diff};
       } :

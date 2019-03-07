@@ -62,7 +62,7 @@ let inversions = t => {
 let romanNumeric = ({type_, key, inversion}, ~for_ as scale: Scale.t) => {
   //TODO: ScalePitch.get MUST BE REWRITTEN
 
-  let chordIndex = scale->Scale.ScalePitch.get->Util.indexOf(key);
+  let chordIndex = scale->Scale.keys->Util.indexOf(key);
 
   let roman =
     switch (chordIndex) {

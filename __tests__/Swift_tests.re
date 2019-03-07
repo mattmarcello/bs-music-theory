@@ -4,7 +4,7 @@ testAll(
   "pitches",
   [
     {
-      let c0 = Pitch.make(`IntegerLiteral(12));
+      let c0 = Pitch.makeWithInteger(12);
 
       Expect.(
         expect((c0.octave, c0.key.accidental, c0.key.type_))
@@ -12,17 +12,17 @@ testAll(
       );
     },
     {
-      let c0 = Pitch.make(`IntegerLiteral(12));
+      let c0 = Pitch.makeWithInteger(12);
       Expect.(
         expect(c0->Pitch.subtractHalfstep(12)->Pitch.rawValue) |> toEqual(0)
       );
     },
     {
-      let pitch = Pitch.make(`MidiNote(127));
+      let pitch = Pitch.makeWithMidiNote(~midiNote=127, ());
       Expect.(expect(pitch.key) |> toEqual(Key.make(~type_=KeyType.G, ())));
     },
     {
-      let pitch = Pitch.make(`MidiNote(0));
+      let pitch = Pitch.makeWithMidiNote(~midiNote=0, ());
       Expect.(expect(pitch.key) |> toEqual(Key.make(~type_=KeyType.C, ())));
     },
     {
@@ -95,14 +95,14 @@ testAll(
         pass : fail("");
     },
     {
-      let p = Pitch.make(`StringLiteral("f#-5"));
+      let p = Pitch.makeWithString("f#-5");
 
       let fsharp = Key.makeWithString("f#");
 
       Expect.(expect(p.key) |> toEqual(fsharp));
     },
     {
-      let p = Pitch.make(`StringLiteral("f#-5"));
+      let p = Pitch.makeWithString("f#-5");
 
       Expect.(expect(p.octave) |> toEqual(-5));
     },
@@ -250,7 +250,7 @@ testAll(
       let cMajScale =
         Scale.{type_: ScaleType.major, key: Key.make(~type_=KeyType.C, ())};
 
-      Expect.(expect(cMajScale |> Pitch.ScaleKeys.get) |> toEqual(cMaj));
+      Expect.(expect(cMajScale |> Scale.keys) |> toEqual(cMaj));
     },
     {
       let cMin = [
@@ -266,7 +266,7 @@ testAll(
       let cMinScale =
         Scale.{type_: ScaleType.minor, key: Key.make(~type_=KeyType.C, ())};
 
-      Expect.(expect(cMinScale |> Pitch.ScaleKeys.get) |> toEqual(cMin));
+      Expect.(expect(cMinScale |> Scale.keys) |> toEqual(cMin));
     },
   ],
   assertion =>
