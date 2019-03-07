@@ -1,34 +1,10 @@
-include Model.Pitch;
-
-
-let toString = ({key, octave} : t ) => {
-  key->Key.description  ++ string_of_int(octave);
-};
-
-let rawValue = ({key, octave}: t ) => {
-  let semitones =
-    key.type_->KeyType.rawValue + key.accidental->Accidental.rawValue;
-  semitones + (octave + 1) * 12;
-};
-
-let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()) : t => {
-  let octave = midiNote / 12 - 1;
-  let keyIndex = midiNote mod 12;
-  let key =
-    (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
-    ->Belt.List.getExn(keyIndex);
-
-  {octave, key};
-};
-let makeWithRawValue = (~rawValue, ()) =>
-  makeWithMidiNote(~midiNote=rawValue, ());
-
-let addHalfstep: (t, int) => t =
-  (pitch, halfstep) => {
-    makeWithRawValue(~rawValue=(pitch |> rawValue) + halfstep, ());
+type t =
+  MusicTheory.Model.Pitch.t = {
+    key: MusicTheory.Model.Key.t,
+    octave: int,
   };
 
-let makeWithStringLiteral = (str: string) : t  => {
+let makeWithString = (str: string): t => {
   let pattern = Js.Re.fromString("([A-Ga-g])([#♯♭b]*)(-?)(\\d+)");
 
   switch (
@@ -45,7 +21,7 @@ let makeWithStringLiteral = (str: string) : t  => {
       Some(signString),
       Some(octaveString),
     ]) =>
-    let keyType = KeyType.makeWithString((keyTypeString));
+    let keyType = KeyType.makeWithString(keyTypeString);
 
     let accidental = Accidental.makeWithString(accidentalString);
 
@@ -63,46 +39,26 @@ let makeWithStringLiteral = (str: string) : t  => {
   };
 };
 
-let make =
-  fun
-  | `IntegerLiteral(i)
-  | `RawValue(i) => makeWithRawValue(~rawValue=i, ())
-  | `MidiNote(midiNote) => makeWithMidiNote(~midiNote, ())
-  | `StringLiteral(s) => makeWithStringLiteral(s);
+let makeWithMidiNote = (~midiNote, ~isPreferredAccidentalSharps=true, ()): t => {
+  let octave = midiNote / 12 - 1;
+  let keyIndex = midiNote mod 12;
+  let key =
+    (isPreferredAccidentalSharps ? Key.keysWithSharps : Key.keysWithFlats)
+    ->Belt.List.getExn(keyIndex);
 
-//* TODO: organize math operators */
+  {octave, key};
+};
+let makeWithRawValue = rawValue => makeWithMidiNote(~midiNote=rawValue, ());
 
-let subtractHalfstep: (t, int) => t =
+let rawValue = ({key, octave}: t) => {
+  let semitones =
+    key.type_->KeyType.rawValue + key.accidental->Accidental.rawValue;
+  semitones + (octave + 1) * 12;
+};
+
+let addHalfstep: (t, int) => t =
   (pitch, halfstep) => {
-    makeWithRawValue(~rawValue=(pitch |> rawValue) - halfstep, ());
-  };
-
-let subtractInterval: (t, Interval.t) => t =
-  (pitch, interval) => {
-    let degree = - (interval.degree - 1);
-    let targetKeyType = pitch.key.type_->KeyType.key(~at=degree);
-    let targetPitch = pitch->subtractHalfstep(interval.semitones);
-
-    let targetOctave =
-      pitch.octave
-      + pitch.key.type_->KeyType.octaveDiff(~for_=interval, ~isHigher=true);
-
-    // convert pitch
-
-    let convertedPitch :  t = {
-      key: Key.make(~type_=targetKeyType, ()),
-      octave: targetOctave,
-    };
-    let diff = targetPitch->rawValue - convertedPitch->rawValue;
-
-    {
-      ...convertedPitch,
-
-      key: {
-        ...convertedPitch.key,
-        accidental: Accidental.makeWithInteger(diff),
-      },
-    };
+    makeWithRawValue((pitch |> rawValue) + halfstep);
   };
 
 let addInterval = (pitch: t, interval: Interval.t) => {
@@ -115,7 +71,7 @@ let addInterval = (pitch: t, interval: Interval.t) => {
 
   //convert pitch
 
-  let convertedPitch : t = {
+  let convertedPitch: t = {
     key: Key.make(~type_=targetKeyType, ()),
     octave: targetOctave,
   };
@@ -131,10 +87,55 @@ let addInterval = (pitch: t, interval: Interval.t) => {
   };
 };
 
+let subtractHalfstep: (t, int) => t =
+  (pitch, halfstep) => {
+    makeWithRawValue((pitch |> rawValue) - halfstep);
+  };
+
+let toString = ({key, octave}: t) => {
+  key->Key.description ++ string_of_int(octave);
+};
+
+let make =
+  fun
+  | `IntegerLiteral(i)
+  | `RawValue(i) => makeWithRawValue(i)
+  | `MidiNote(midiNote) => makeWithMidiNote(~midiNote, ())
+  | `StringLiteral(s) => makeWithString(s);
+
+
+let subtractInterval: (t, Interval.t) => t =
+  (pitch, interval) => {
+    let degree = - (interval.degree - 1);
+    let targetKeyType = pitch.key.type_->KeyType.key(~at=degree);
+    let targetPitch = pitch->subtractHalfstep(interval.semitones);
+
+    let targetOctave =
+      pitch.octave
+      + pitch.key.type_->KeyType.octaveDiff(~for_=interval, ~isHigher=true);
+
+    // convert pitch
+
+    let convertedPitch: t = {
+      key: Key.make(~type_=targetKeyType, ()),
+      octave: targetOctave,
+    };
+    let diff = targetPitch->rawValue - convertedPitch->rawValue;
+
+    {
+      ...convertedPitch,
+
+      key: {
+        ...convertedPitch.key,
+        accidental: Accidental.makeWithInteger(diff),
+      },
+    };
+  };
+
+
 let equal = (p', p'') => p'->rawValue == p''->rawValue;
 
 let frequency = pitch => {
-
   Js.Math.pow_float(
     ~base=2.,
     ~exp=(float_of_int(rawValue(pitch)) -. 69.) /. 12.,
@@ -151,12 +152,10 @@ let nearest = frequency' => {
       )
     ->Belt.List.flatten;
 
-
   let results =
     allPitches->Belt.List.map(pitch =>
       (pitch, Js.Math.abs_float(pitch->frequency -. frequency'))
     );
-
 
   let sorted =
     results->Belt.List.sort(((_, d'), (_, d'')) =>
@@ -165,7 +164,6 @@ let nearest = frequency' => {
 
   sorted->Belt.List.head->Belt.Option.map(fst);
 };
-
 
 module ScaleKeys = {
   module B = Belt;
@@ -260,5 +258,5 @@ let subtractPitch: (t, t) => Interval.t =
       );
   };
 
-
-let description = ({ key, octave}) => key -> Key.description  ++ octave -> string_of_int
+let description = ({key, octave}) =>
+  key->Key.description ++ octave->string_of_int;
