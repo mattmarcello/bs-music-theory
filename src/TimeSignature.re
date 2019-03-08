@@ -1,6 +1,6 @@
 include Model.TimeSignature;
 
-let make = (~beats=4, ~noteValue=NoteValueType.Quarter, ()) => {
+let make = (~beats=4, ~noteValue=Model.NoteValueType.Quarter, ()) => {
   beats,
   noteValue,
 };
