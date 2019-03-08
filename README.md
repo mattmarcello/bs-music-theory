@@ -2,7 +2,7 @@
 
 This is basically a straight port of [this](https://github.com/cemolcay/MusicTheory) library.  It is a collection of data structures that represent musical entities, such as `Key`, `Pitch`, `Interval`, `Scale`, and `Chord`.
 
-# Installation
+## Installation
 
 ```
 yarn add bs-music-theory
@@ -28,4 +28,3 @@ Additional documentation forthcoming.
 yarn run test
 ```
 
-- 
