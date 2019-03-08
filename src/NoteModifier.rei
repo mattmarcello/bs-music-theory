@@ -1,5 +1,5 @@
 type t =
-  MusicTheory.Model.NoteModifier.t =
+  Model.NoteModifier.t =
     Default
   | Dotted
   | Triplet

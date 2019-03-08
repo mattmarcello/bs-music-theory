@@ -1,5 +1,5 @@
 type t =
-  MusicTheory.Model.NoteValueType.t =
+  Model.NoteValueType.t =
     DoubleWhole
   | Whole
   | Half

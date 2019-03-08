@@ -1,4 +1,9 @@
-include Model.NoteModifier;
+type t =
+  Model.NoteModifier.t =
+    Default
+  | Dotted
+  | Triplet
+  | Quintuplet;
 
 let rawValue =
   fun

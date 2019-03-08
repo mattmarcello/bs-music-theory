@@ -1,4 +1,4 @@
-type t = MusicTheory.Model.KeyType.t = | C | D | E | F | G | A | B;
+type t = Model.KeyType.t = | C | D | E | F | G | A | B;
 
 let makeWithString =
   fun

@@ -1,5 +1,5 @@
 type t =
-  MusicTheory.Model.HarmonicField.t =
+  Model.HarmonicField.t =
     Triad
   | Tetrad
   | Ninth

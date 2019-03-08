@@ -5,7 +5,7 @@ type t =
     inversion: int,
   };
 
-let make = (~type_: ChordType.t, ~key: Key.t, ~inversion: int=0, ()): t => {
+let make = (~type_: Model.ChordType.t, ~key: Model.Key.t, ~inversion: int=0, ()): t => {
   type_,
   key,
   inversion,

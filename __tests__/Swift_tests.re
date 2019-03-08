@@ -43,7 +43,7 @@ testAll(
 
       let db1 = Pitch.{key: Key.makeWithString("db"), octave: 1};
 
-      c1->Pitch.addInterval(Interval.minor2)->Pitch.equal(db1) ?
+      c1->Pitch.addInterval(Interval.minor2)->Pitch.equals(db1) ?
         pass : fail("");
     },
     {
@@ -51,7 +51,7 @@ testAll(
 
       let d1 = Pitch.{key: Key.makeWithString("d"), octave: 1};
 
-      c1->Pitch.addInterval(Interval.major2)->Pitch.equal(d1) ?
+      c1->Pitch.addInterval(Interval.major2)->Pitch.equals(d1) ?
         pass : fail("");
     },
     {
@@ -59,7 +59,7 @@ testAll(
 
       let eb1 = Pitch.{key: Key.makeWithString("eb"), octave: 1};
 
-      c1->Pitch.addInterval(Interval.minor3)->Pitch.equal(eb1) ?
+      c1->Pitch.addInterval(Interval.minor3)->Pitch.equals(eb1) ?
         pass : fail("");
     },
     {
@@ -67,7 +67,7 @@ testAll(
 
       let e1 = Pitch.{key: Key.makeWithString("e"), octave: 1};
 
-      c1->Pitch.addInterval(Interval.major3)->Pitch.equal(e1) ?
+      c1->Pitch.addInterval(Interval.major3)->Pitch.equals(e1) ?
         pass : fail("");
     },
     {
@@ -75,7 +75,7 @@ testAll(
 
       let c2 = Pitch.{key: Key.makeWithString("C"), octave: 2};
 
-      c1->Pitch.addInterval(Interval.perfect8)->Pitch.equal(c2) ?
+      c1->Pitch.addInterval(Interval.perfect8)->Pitch.equals(c2) ?
         pass : fail("");
     },
     {
@@ -83,7 +83,7 @@ testAll(
 
       let csharp1 = Pitch.{key: Key.makeWithString("C#"), octave: 1};
 
-      d1->Pitch.subtractInterval(Interval.minor2)->Pitch.equal(csharp1) ?
+      d1->Pitch.subtractInterval(Interval.minor2)->Pitch.equals(csharp1) ?
         pass : fail("");
     },
     {
@@ -91,7 +91,7 @@ testAll(
 
       let c1 = Pitch.{key: Key.makeWithString("C"), octave: 1};
 
-      d1->Pitch.subtractInterval(Interval.major2)->Pitch.equal(c1) ?
+      d1->Pitch.subtractInterval(Interval.major2)->Pitch.equals(c1) ?
         pass : fail("");
     },
     {
@@ -203,7 +203,7 @@ test("sample length calculations", () => {
     NoteValue.{type_: Sixtyfourth, modifier: Default},
   ];
 
-  let tempo = Tempo.default;
+  let tempo = Tempo.make();
 
   let round = f =>
     f -. Js.Math.floor_float(f) >= 0.5 ?

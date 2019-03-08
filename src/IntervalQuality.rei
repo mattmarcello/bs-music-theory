@@ -1,5 +1,5 @@
 type t =
-  MusicTheory.Model.IntervalQuality.t =
+  Model.IntervalQuality.t =
     Diminished
   | Perfect
   | Minor

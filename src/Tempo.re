@@ -1,6 +1,9 @@
 include Model.Tempo;
 
-let default = {timeSignature: TimeSignature.default, bpm: 120.};
+let make = (~timeSignature=TimeSignature.make(), ~bpm=120.,()) => {
+  timeSignature,
+  bpm,
+};
 
 //TODO: make sure consistent convention look at call site
 

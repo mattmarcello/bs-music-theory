@@ -1,12 +1,12 @@
 type t =
-  MusicTheory.Model.Key.t = {
-    type_: MusicTheory.Model.KeyType.t,
-    accidental: MusicTheory.Model.Accidental.t,
+  Model.Key.t = {
+    type_: Model.KeyType.t,
+    accidental: Model.Accidental.t,
   };
 let make:
   (
-    ~type_: MusicTheory.Model.KeyType.t,
-    ~accidental: MusicTheory.Model.Accidental.t=?,
+    ~type_: Model.KeyType.t,
+    ~accidental: Model.Accidental.t=?,
     unit
   ) =>
   t;

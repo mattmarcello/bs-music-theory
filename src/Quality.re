@@ -1,1 +1,7 @@
-include Model.Quality;
+type t =
+  Model.Quality.t =
+    Diminished
+  | Perfect
+  | Minor
+  | Major
+  | Augmented;

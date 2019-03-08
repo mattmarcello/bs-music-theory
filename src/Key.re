@@ -1,7 +1,7 @@
 type t =
-  MusicTheory.Model.Key.t = {
-    type_: MusicTheory.Model.KeyType.t,
-    accidental: MusicTheory.Model.Accidental.t,
+  Model.Key.t = {
+    type_: Model.KeyType.t,
+    accidental: Model.Accidental.t,
   };
 
 let make = (~type_, ~accidental=Accidental.Natural, ()) => {

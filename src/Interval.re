@@ -1,13 +1,13 @@
 type t =
-  MusicTheory.Model.Interval.t = {
-    quality: MusicTheory.Model.IntervalQuality.t,
+  Model.Interval.t = {
+    quality: Model.IntervalQuality.t,
     degree: int,
     semitones: int,
   };
 
 let make =
     (
-      ~quality: MusicTheory.Model.IntervalQuality.t,
+      ~quality: Model.IntervalQuality.t,
       ~degree: int,
       ~semitones: int,
     ) => {

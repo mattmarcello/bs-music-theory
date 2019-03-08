@@ -1,6 +1,6 @@
 type t =
-  MusicTheory.Model.ScaleType.t = {
-    intervals: list(MusicTheory.Model.Interval.t),
+  Model.ScaleType.t = {
+    intervals: list(Model.Interval.t),
     description: string,
   };
 

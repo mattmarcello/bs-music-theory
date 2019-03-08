@@ -1,6 +1,6 @@
 type t =
-  MusicTheory.Model.Pitch.t = {
-    key: MusicTheory.Model.Key.t,
+  Model.Pitch.t = {
+    key: Model.Key.t,
     octave: int,
   };
 
@@ -95,10 +95,6 @@ let subtractHalfstep: (t, int) => t =
     makeWithInteger((pitch |> rawValue) - halfstep);
   };
 
-let toString = ({key, octave}: t) => {
-  key->Key.description ++ string_of_int(octave);
-};
-
 let subtractInterval: (t, Interval.t) => t =
   (pitch, interval) => {
     let degree = - (interval.degree - 1);
@@ -127,7 +123,12 @@ let subtractInterval: (t, Interval.t) => t =
     };
   };
 
-let equal = (p', p'') => p'->rawValue == p''->rawValue;
+let equals = (p', p'') => p'->rawValue == p''->rawValue;
+
+let equalsStrict = Pervasives.(==);
+
+let lessThan = (p', p'') => p'->rawValue < p''->rawValue;
+
 
 let frequency = pitch => {
   Js.Math.pow_float(

@@ -1,10 +1,10 @@
 type t =
-  MusicTheory.Model.ScaleType.t = {
-  intervals: list(MusicTheory.Model.Interval.t),
+  Model.ScaleType.t = {
+  intervals: list(Model.Interval.t),
   description: string,
 };
 let make:
-  (~intervals: list(MusicTheory.Interval.t), ~description: string=?, 
+  (~intervals: list(Interval.t), ~description: string=?, 
   unit) => t;
 let ionian: t;
 let aeolian: t;
