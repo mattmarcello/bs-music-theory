@@ -4,6 +4,7 @@ type t =
     accidental: Model.Accidental.t,
   };
 
+
 let make = (~type_, ~accidental=Accidental.Natural, ()) => {
   type_,
   accidental,
