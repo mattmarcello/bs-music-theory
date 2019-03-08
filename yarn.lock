@@ -117,6 +117,12 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
+"@elliottcable/bs-cmdliner@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@elliottcable/bs-cmdliner/-/bs-cmdliner-1.0.2.tgz#825b3351d3beee7def38f7603b81e2a8bb73e939"
+  dependencies:
+    bs-platform "^4.0.1"
+
 "@glennsl/bs-jest@^0.4.7":
   version "0.4.7"
   resolved "https://registry.yarnpkg.com/@glennsl/bs-jest/-/bs-jest-0.4.7.tgz#9719dc8c8ceed11d2de92adf9e02dd364c3f9398"
@@ -532,9 +538,15 @@ browser-resolve@^1.11.3:
   dependencies:
     resolve "1.1.7"
 
-bs-platform@^4.0.18:
+bs-platform@^4.0.1, bs-platform@^4.0.18:
   version "4.0.18"
   resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-4.0.18.tgz#d17b8693ba1f714d9b27e0ddb365f2069ba4b8a0"
+
+bsdoc@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/bsdoc/-/bsdoc-0.1.4.tgz#3da672d9d4c5be33512e1d14c27225e17180e805"
+  dependencies:
+    "@elliottcable/bs-cmdliner" "^1.0.2"
 
 bser@^2.0.0:
   version "2.0.0"

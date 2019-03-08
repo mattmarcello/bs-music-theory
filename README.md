@@ -16,5 +16,10 @@ Then add bs-music-theory to bs-dependencies in your bsconfig.json:
   "bs-dependencies": ["bs-music-theory"]
 }
 ```
+# Usage 
 
+These usage instructions are reproduced directly from the [swift MusicTheory](https://github.com/cemolcay/MusicTheory) library.
+
+
+## `Pitch` and `Key`
 

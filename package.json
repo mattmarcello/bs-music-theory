@@ -16,6 +16,7 @@
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.7",
     "bs-platform": "^4.0.18",
+    "bsdoc": "^0.1.4",
     "jest": "^24.0.0"
   },
   "dependencies": {}
