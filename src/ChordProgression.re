@@ -63,7 +63,7 @@ let all = [
 let chords =
     (
       t,
-      ~scale: Model.Scale.t,
+      ~for_ as scale: Model.Scale.t,
       ~harmonicField: Model.HarmonicField.t,
       ~inversion=0,
       (),

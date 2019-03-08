@@ -1,4 +1,4 @@
-type t = Model.ChordProgression.t = { nodes: list(ChordProgressionNode.t), };
+type t = Model.ChordProgression.t = {nodes: list(ChordProgressionNode.t)};
 let make: list(ChordProgressionNode.t) => t;
 let allNodes: t;
 let i_v_vi_iv: t;
@@ -20,7 +20,13 @@ let i_v_ii_iv: t;
 let ii_iv_i_v: t;
 let all: list(t);
 let chords:
-  (t, ~scale: Model.Scale.t, ~harmonicField: Model.HarmonicField.t,
-  ~inversion: int=?, unit) => Belt.List.t(Model.Chord.t);
+  (
+    t,
+    ~for_: Model.Scale.t,
+    ~harmonicField: Model.HarmonicField.t,
+    ~inversion: int=?,
+    unit
+  ) =>
+  Belt.List.t(Model.Chord.t);
 let description: t => string;
 let equals: (t, t) => bool;
