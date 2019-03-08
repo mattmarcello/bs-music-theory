@@ -31,8 +31,7 @@ module ChordThirdType = {
 };
 
 module ChordFifthType = {
-  type t =
-    Model.ChordFifthType.t = | Perfect | Diminished | Augmented;
+  type t = Model.ChordFifthType.t = | Perfect | Diminished | Augmented;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -94,8 +93,7 @@ module ChordSixthType = {
 };
 
 module ChordSeventhType = {
-  type t =
-    Model.ChordSeventhType.t = | Major | Dominant | Diminished;
+  type t = Model.ChordSeventhType.t = | Major | Dominant | Diminished;
 
   let makeWithInterval: Interval.t => option(t) =
     interval => {
@@ -164,8 +162,7 @@ module ChordSuspendedType = {
 
 module ChordExtensionType = {
   module ExtensionType = {
-    type t =
-      Model.ExtensionType.t = | Ninth | Eleventh | Thirteenth;
+    type t = Model.ExtensionType.t = | Ninth | Eleventh | Thirteenth;
 
     let rawValue =
       fun
@@ -609,12 +606,25 @@ let all: list(t) = {
         combinations(~elements=ChordExtensionType.all, ~taking=3, ()),
       );
 
-  allThird->Belt.List.forEach(third =>
-    allFifth->Belt.List.forEach(fifth =>
-      allSixth->Belt.List.forEach(sixth =>
-        allSeventh->Belt.List.forEach(seventh =>
-          allSus->Belt.List.forEach(suspended =>
-            allExt->Belt.List.forEach(extensions =>
+  for (i in 0 to allThird->Belt.List.length - 1) {
+    let third = allThird->Belt.List.getExn(i);
+
+    for (i in 0 to allFifth->Belt.List.length - 1) {
+      let fifth = allFifth->Belt.List.getExn(i);
+
+    for (i in 0 to allSixth->Belt.List.length - 1) {
+      let sixth = allSixth->Belt.List.getExn(i);
+
+
+    for (i in 0 to allSeventh->Belt.List.length - 1) {
+      let seventh = allSeventh->Belt.List.getExn(i);
+
+    for (i in 0 to allSus->Belt.List.length - 1) {
+      let suspended = allSus->Belt.List.getExn(i);
+
+    for (i in 0 to allExt->Belt.List.length - 1) {
+      let extensions = allExt->Belt.List.getExn(i);
+
               all :=
                 Belt.List.concat(
                   all^,
@@ -630,12 +640,20 @@ let all: list(t) = {
                     ),
                   ],
                 )
-            )
-          )
-        )
-      )
-    )
-  );
+
+
+    };
+
+    };
+
+    };
+
+
+    };
+
+    };
+  };
+
 
   all^;
 };
@@ -647,4 +665,3 @@ let equals = (c': option(t), c'': option(t)): bool => {
   | _ => false
   };
 };
-

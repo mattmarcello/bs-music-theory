@@ -3,11 +3,13 @@ type t =
     type_: Model.ScaleType.t,
     key: Model.Key.t,
   };
+
 let make =
     (~type_: Model.ScaleType.t, ~key: Model.Key.t) => {
   type_,
   key,
 };
+
 let pitches = (scale: t, ~octaves: list(int), ()) => {
   octaves->Belt.List.reduce(
     [],
