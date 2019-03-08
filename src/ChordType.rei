@@ -101,6 +101,6 @@ let intervals: t => Belt.List.t(Model.Interval.t);
 
 let notation: t => string;
 let description: t => string;
-let all: list(t);
+/* let all: list(t); */
 let equals: (option(t), option(t)) => bool;
 

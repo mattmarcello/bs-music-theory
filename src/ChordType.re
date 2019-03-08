@@ -549,114 +549,105 @@ let description = ({third, fifth, sixth, seventh, suspended, extensions}) => {
   desc->Belt.List.toArray |> Js.Array.joinWith("");
 };
 
-let all: list(t) = {
-  let rec combinations =
-          (~elements: list(ChordExtensionType.t), ~taking: int=1, ())
-          : list(list(ChordExtensionType.t)) =>
-    if (elements->Belt.List.length < 0) {
-      [];
-    } else if (elements->Belt.List.length <= 0 && taking <= 0) {
-      [[]];
-    } else if (taking == 1) {
-      elements->Belt.List.map(el => [el]);
-    } else {
-      let comb = ref([[]]);
+/* let all: list(t) = { */
+/*   let rec combinations = */
+/*           (~elements: list(ChordExtensionType.t), ~taking: int=1, ()) */
+/*           : list(list(ChordExtensionType.t)) => */
+/*     if (elements->Belt.List.length < 0) { */
+/*       []; */
+/*     } else if (elements->Belt.List.length <= 0 && taking <= 0) { */
+/*       [[]]; */
+/*     } else if (taking == 1) { */
+/*       elements->Belt.List.map(el => [el]); */
+/*     } else { */
+/*       let comb = ref([[]]); */
 
-      for (index in 0 to elements->Belt.List.size - 1) {
-        let element = elements->Belt.List.getExn(index);
+/*       for (index in 0 to elements->Belt.List.size - 1) { */
+/*         let element = elements->Belt.List.getExn(index); */
 
-        let reducedElements =
-          elements->Belt.List.drop(index + 1)->Belt.Option.getExn;
+/*         let reducedElements = */
+/*           elements->Belt.List.drop(index + 1)->Belt.Option.getExn; */
 
-        comb :=
-          Belt.List.concat(
-            comb^,
-            combinations(~elements=reducedElements, ~taking=taking - 1, ())
-            ->Belt.List.map(comb => Belt.List.concat([element], comb)),
-          );
-      };
+/*         comb := */
+/*           Belt.List.concat( */
+/*             comb^, */
+/*             combinations(~elements=reducedElements, ~taking=taking - 1, ()) */
+/*             ->Belt.List.map(comb => Belt.List.concat([element], comb)), */
+/*           ); */
+/*       }; */
 
-      comb^;
-    };
+/*       comb^; */
+/*     }; */
 
-  let all = ref([]);
+/*   let all = ref([]); */
 
-  let allThird = ChordThirdType.all;
+/*   let allThird = ChordThirdType.all; */
 
-  let allFifth = ChordFifthType.all;
+/*   let allFifth = ChordFifthType.all; */
 
-  let allSixth = [Some(ChordSixthType.Sixth), None];
+/*   let allSixth = [Some(ChordSixthType.Sixth), None]; */
 
-  let allSeventh =
-    ChordSeventhType.all
-    ->Belt.List.map(x => Some(x))
-    ->Belt.List.concat([None]);
+/*   let allSeventh = */
+/*     ChordSeventhType.all */
+/*     ->Belt.List.map(x => Some(x)) */
+/*     ->Belt.List.concat([None]); */
 
-  let allSus =
-    ChordSuspendedType.all
-    ->Belt.List.map(x => Some(x))
-    ->Belt.List.concat([None]);
+/*   let allSus = */
+/*     ChordSuspendedType.all */
+/*     ->Belt.List.map(x => Some(x)) */
+/*     ->Belt.List.concat([None]); */
 
-  let allExt =
-    combinations(~elements=ChordExtensionType.all, ~taking=1, ())
-    ->Belt.List.concat(
-        combinations(~elements=ChordExtensionType.all, ~taking=2, ()),
-      )
-    ->Belt.List.concat(
-        combinations(~elements=ChordExtensionType.all, ~taking=3, ()),
-      );
+/*   let allExt = */
+/*     combinations(~elements=ChordExtensionType.all, ~taking=1, ()) */
+/*     ->Belt.List.concat( */
+/*         combinations(~elements=ChordExtensionType.all, ~taking=2, ()), */
+/*       ) */
+/*     ->Belt.List.concat( */
+/*         combinations(~elements=ChordExtensionType.all, ~taking=3, ()), */
+/*       ); */
 
-  for (i in 0 to allThird->Belt.List.length - 1) {
-    let third = allThird->Belt.List.getExn(i);
+/*   for (i in 0 to allThird->Belt.List.length - 1) { */
+/*     let third = allThird->Belt.List.getExn(i); */
 
-    for (i in 0 to allFifth->Belt.List.length - 1) {
-      let fifth = allFifth->Belt.List.getExn(i);
+/*     for (i in 0 to allFifth->Belt.List.length - 1) { */
+/*       let fifth = allFifth->Belt.List.getExn(i); */
 
-    for (i in 0 to allSixth->Belt.List.length - 1) {
-      let sixth = allSixth->Belt.List.getExn(i);
+/*       for (i in 0 to allSixth->Belt.List.length - 1) { */
+/*         let sixth = allSixth->Belt.List.getExn(i); */
 
+/*         for (i in 0 to allSeventh->Belt.List.length - 1) { */
+/*           let seventh = allSeventh->Belt.List.getExn(i); */
 
-    for (i in 0 to allSeventh->Belt.List.length - 1) {
-      let seventh = allSeventh->Belt.List.getExn(i);
+/*           for (i in 0 to allSus->Belt.List.length - 1) { */
+/*             let suspended = allSus->Belt.List.getExn(i); */
 
-    for (i in 0 to allSus->Belt.List.length - 1) {
-      let suspended = allSus->Belt.List.getExn(i);
+/*             for (i in 0 to allExt->Belt.List.length - 1) { */
+/*               let extensions = allExt->Belt.List.getExn(i); */
 
-    for (i in 0 to allExt->Belt.List.length - 1) {
-      let extensions = allExt->Belt.List.getExn(i);
+/*               all := */
+/*                 Belt.List.concat( */
+/*                   all^, */
+/*                   [ */
+/*                     make( */
+/*                       ~third, */
+/*                       ~fifth, */
+/*                       ~sixth?, */
+/*                       ~seventh?, */
+/*                       ~suspended?, */
+/*                       ~extensions, */
+/*                       (), */
+/*                     ), */
+/*                   ], */
+/*                 ); */
+/*             }; */
+/*           }; */
+/*         }; */
+/*       }; */
+/*     }; */
+/*   }; */
 
-              all :=
-                Belt.List.concat(
-                  all^,
-                  [
-                    make(
-                      ~third,
-                      ~fifth,
-                      ~sixth?,
-                      ~seventh?,
-                      ~suspended?,
-                      ~extensions,
-                      (),
-                    ),
-                  ],
-                )
-
-
-    };
-
-    };
-
-    };
-
-
-    };
-
-    };
-  };
-
-
-  all^;
-};
+/*   all^; */
+/* }; */
 
 let equals = (c': option(t), c'': option(t)): bool => {
   switch (c', c'') {
