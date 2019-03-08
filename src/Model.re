@@ -64,7 +64,7 @@ module ChordExtensionType = {
   type t = {
     type_: ExtensionType.t,
     accidental: Accidental.t,
-    isAdded: bool, //TODO refactor
+    isAdded: bool //TODO refactor
   };
 };
 
@@ -171,16 +171,30 @@ module Scale = {
 };
 
 module TimeSignature = {
-
-type t = {
-  beats: int,
-  noteValue: NoteValueType.t,
+  type t = {
+    beats: int,
+    noteValue: NoteValueType.t,
+  };
 };
-}
 
 module Tempo = {
   type t = {
     timeSignature: TimeSignature.t,
     bpm: float,
   };
+};
+
+module ChordProgressionNode = {
+  type t =
+    | I
+    | II
+    | III
+    | IV
+    | V
+    | VI
+    | VII;
+};
+
+module ChordProgression = {
+  type t = {nodes: list(ChordProgressionNode.t)};
 };

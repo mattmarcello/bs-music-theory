@@ -162,3 +162,17 @@ module Tempo: {
     bpm: float,
   };
 };
+
+module ChordProgressionNode: {
+  type t =
+    | I
+    | II
+    | III
+    | IV
+    | V
+    | VI
+    | VII;
+};
+
+module ChordProgression: {type t = {nodes: list(ChordProgressionNode.t)};
+};
