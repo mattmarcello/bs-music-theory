@@ -55,4 +55,3 @@ let pureMinor: t;
 let dominant7th: t;
 let all: list(t);
 let equals: (t, t) => bool;
-module Infix: { let ( == ): (t, t) => bool; };

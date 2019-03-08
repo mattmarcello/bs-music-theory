@@ -78,7 +78,3 @@ let description = ({type_, accidental}) => {
   KeyType.description(type_) ++ " " ++ Accidental.notation(accidental);
 };
 
-module Infix = {
-  let (==) = equals;
-  let (===) = equalsStrict;
-};

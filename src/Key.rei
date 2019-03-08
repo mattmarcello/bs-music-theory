@@ -16,7 +16,3 @@ let equalsStrict: (t, t) => bool;
 let keysWithSharps: list(t);
 let keysWithFlats: list(t);
 let description: t => string;
-module Infix: {
-  let (==): (t, t) => bool;
-  let (===): (t, t) => bool;
-};

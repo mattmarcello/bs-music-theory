@@ -162,6 +162,3 @@ let description = ({type_, key, inversion}) => {
   ++ inversionNotation;
 };
 
-module Infix = {
-  let (==) = equals;
-};

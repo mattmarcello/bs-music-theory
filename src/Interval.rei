@@ -74,7 +74,3 @@ let augmented15: t;
 
 let all: list(t);
 
-module Infix: {
-  let (==): (t, t) => bool;
-  let (===): (t, t) => bool;
-};

@@ -31,4 +31,3 @@ let notation: t => string;
 
 let description: t => string;
 
-module Infix: {let (==): (option(t), option(t)) => bool;};

@@ -104,7 +104,3 @@ let description: t => string;
 let all: list(t);
 let equals: (option(t), option(t)) => bool;
 
-module Infix : {
-let (==): (option(t), option(t)) => bool;
-}
-

@@ -141,8 +141,3 @@ let all = [
   augmented14,
   augmented15,
 ];
-
-module Infix = {
-  let (==) = equals;
-  let (===) = equalsStrict;
-};

@@ -44,20 +44,3 @@ let notation: t => string;
 
 let description: t => string;
 
-module Infix: {
-  let (+): (t, t) => t;
-
-  let (-): (t, t) => t;
-
-  let (++): (t, int) => t;
-
-  let (--): (t, int) => t;
-
-  let ( * ): (t, int) => t;
-
-  let (/): (t, int) => t;
-
-  let (==): (t, t) => bool;
-
-  let (===): (t, t) => bool;
-};

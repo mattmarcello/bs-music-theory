@@ -648,6 +648,3 @@ let equals = (c': option(t), c'': option(t)): bool => {
   };
 };
 
-module Infix = {
-  let (==) = equals;
-};

@@ -457,6 +457,3 @@ let all = [
 
 let equals = (t', t'') => t'.intervals == t''.intervals;
 
-module Infix = {
-  let (==) = equals;
-};

@@ -86,14 +86,3 @@ let notation =
   | Natural => "♮"
   | type_ => description(type_);
 
-
-module Infix = {
-  let (+) = add;
-  let (-) = subtract;
-  let (++) = addInt;
-  let (--) = subtractInt;
-  let (/) = divideInt;
-  let (*) = multiplyInt;
-  let (==) = equals;
-  let (===) = equalsStrict;
-};
