@@ -1,6 +1,252 @@
 open Jest;
 
 testAll(
+  "intervals",
+  [
+    {
+      let key = Key.make(~type_=C, ());
+
+      let pitch = Pitch.{key, octave: 1};
+
+      Expect.(
+        expect(
+          {
+            let pitch: Pitch.t = pitch->Pitch.addHalfstep(12);
+            pitch.octave;
+          },
+        )
+        |> toEqual(pitch.octave + 1)
+      );
+    },
+    {
+      let pitch =
+        {key: Key.make(~type_=C, ()), octave: 1}->Pitch.addHalfstep(1);
+
+      let actual = pitch.key;
+
+      let expected = Key.{type_: C, accidental: Accidental.sharp};
+
+      Key.equals(actual, expected) ? pass : fail("");
+    },
+    {
+      let pitch' =
+        Pitch.{key: Key.make(~type_=C, ()), octave: 1}
+        ->Pitch.subtractHalfstep(1);
+
+      let pitch'' = Pitch.{key: Key.make(~type_=B, ()), octave: 0};
+
+      Expect.(expect(pitch') |> toEqual(pitch''));
+    },
+    {
+      let c1 = Pitch.{key: Key.make(~type_=C, ()), octave: 1};
+
+      let d1 = Pitch.{key: Key.make(~type_=D, ()), octave: 1};
+
+      let actual = d1->Pitch.subtractPitch(c1);
+
+      let expected = Interval.major2;
+
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+  ],
+  assertion =>
+  assertion
+);
+
+testAll(
+  "Accidentals",
+  Accidental.[
+    {
+      let (actual, expected) = (flat->multiplyInt(2), doubleFlat);
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (doubleFlat->divideInt(2), flat);
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (
+        Accidental.sharps(2)->subtractInt(2),
+        Accidental.natural,
+      );
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (
+        Accidental.flats(2)->addInt(2),
+        Accidental.natural,
+      );
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (
+        Accidental.sharps(2)->add(Accidental.sharps(1)),
+        Accidental.makeWithInteger(3),
+      );
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("#"), Sharps(1));
+
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("##"), Sharps(2));
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (
+        Accidental.makeWithString("###"),
+        Sharps(3),
+      );
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("b"), Flats(1));
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("bb"), Flats(2));
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("bbb"), Flats(3));
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString(""), Natural);
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+    {
+      let (actual, expected) = (Accidental.makeWithString("#b#b"), Natural);
+      Expect.(expect(actual) |> toEqual(expected));
+    },
+  ],
+  assertion =>
+  assertion
+);
+
+testAll(
+  "keys",
+  [
+    {
+      let (actual, expected) = (
+        Key.makeWithString("a##b"),
+        Key.{type_: A, accidental: Sharps(1)},
+      );
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let (actual, expected) = (
+        Key.makeWithString("a#"),
+        Key.{type_: A, accidental: Sharps(1)},
+      );
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let actual = Key.{type_: C, accidental: Accidental.flat};
+      let expected = Key.{type_: B, accidental: Natural};
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let actual = Key.{type_: C, accidental: Sharps(23)};
+      let expected = Key.{type_: B, accidental: Natural};
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let actual = Key.{type_: C, accidental: Flats(13)};
+      let expected = Key.{type_: B, accidental: Natural};
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let actual = Key.{type_: C, accidental: Flats(25)};
+      let expected = Key.{type_: B, accidental: Natural};
+
+      Key.equals(expected, actual) ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedKey) = KeyType.(D, (-2), B);
+
+      KeyType.key(key, ~at=distance) == expectedKey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, (-19), F);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, 12, B);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, 0, D);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, 1, E);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, 2, F);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, (-3), A);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(D, (-301), D);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key, distance, expectedkey) = KeyType.(F, (-3), C);
+      KeyType.key(key, ~at=distance) == expectedkey ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, B, 5);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, F, 2);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, D, 0);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, E, 1);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, F, 2);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(D, A, 4);
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+    {
+      let (key', key'', distance) = KeyType.(F, C, (-3));
+
+      KeyType.distance(key', ~from=key'') == distance ? pass : fail("");
+    },
+  ],
+  assertion =>
+  assertion
+);
+
+testAll(
   "pitches",
   [
     {
@@ -666,20 +912,6 @@ test("inversions", () => {
       ],
     ];
 
-  c7
-  ->Chord.inversions
-  ->Belt.List.map(chord =>
-      Chord.pitches(chord, ~octave=1, ())
-      ->Belt.List.map(Pitch.description)
-      ->Belt.List.toArray
-    )
-  ->Belt.List.toArray
-  ->Js.log2("pitches");
-
-  c7Inversions
-  ->Belt.List.map(x => Belt.List.map(x, Pitch.description)->Belt.List.toArray)
-  ->Belt.List.toArray
-  ->Js.log;
 
   Expect.(
     expect(
