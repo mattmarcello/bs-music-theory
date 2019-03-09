@@ -69,8 +69,12 @@ let chords =
       (),
     ) => {
   let indices = t.nodes->Belt.List.map(ChordProgressionNode.rawValue);
-  let harmonics =
+
+  let harmonics: list(Chord.t) =
     scale->Scale.harmonicField(~for_=harmonicField, ~inversion, ());
+
+  Js.log2("harmonics", harmonics -> Belt.List.map(Chord.description) -> Belt.List.toArray )
+
 
   indices->Belt.List.reduce([], (acc, index) =>
     if (index < harmonics->Belt.List.size) {

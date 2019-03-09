@@ -25,7 +25,7 @@ let notation = ({quality, degree}) => {
 };
 
 let description  = ({quality, degree}) => {
-  IntervalQuality.notation(quality) ++ " " ++ string_of_int(degree);
+  IntervalQuality.description(quality) ++ " " ++ string_of_int(degree);
 };
 
 let perfect1 = {quality: Perfect, degree: 1, semitones: 0};

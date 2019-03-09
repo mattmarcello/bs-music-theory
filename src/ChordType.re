@@ -546,7 +546,7 @@ let description = ({third, fifth, sixth, seventh, suspended, extensions}) => {
     )
     ->Belt.List.keepMap(Util.identity);
 
-  desc->Belt.List.toArray |> Js.Array.joinWith("");
+  desc->Belt.List.toArray |> Js.Array.joinWith(" ");
 };
 
 let all = () => {

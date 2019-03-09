@@ -4,7 +4,6 @@ type t =
     accidental: Model.Accidental.t,
   };
 
-
 let make = (~type_, ~accidental=Accidental.Natural, ()) => {
   type_,
   accidental,
@@ -76,6 +75,5 @@ let keysWithFlats = [
 ];
 
 let description = ({type_, accidental}) => {
-  KeyType.description(type_) ++ " " ++ Accidental.notation(accidental);
+  KeyType.description(type_)  ++ Accidental.description(accidental);
 };
-
