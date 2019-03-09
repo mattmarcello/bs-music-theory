@@ -20,11 +20,23 @@ jobs:
       - checkout
 
       # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run: yarn --ignore-engines
 
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+
       # build 
       - run: yarn build
+      
 
       # run tests!
       - run: yarn test-circle
