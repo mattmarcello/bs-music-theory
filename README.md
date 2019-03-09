@@ -22,7 +22,7 @@ Look [here](https://github.com/cemolcay/MusicTheory).
 
 Additional documentation forthcoming.  
 
-[Here](https://github.com/mattmarcello/bs-music-theory-examples) is a repo will I will attempt to provide some usage examples.
+[Here](https://github.com/mattmarcello/bs-music-theory-examples) is a repo.  I will attempt to provide some usage examples.
 
 ## Tests
 
