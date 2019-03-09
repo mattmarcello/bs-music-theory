@@ -19,5 +19,11 @@
     "bsdoc": "^0.1.4",
     "jest": "^24.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "description": "A port of the Swift MusicTheory library",
+  "license": "LGPL-3.0",
+  "keywords": ["music"],
+  "homepage": "https://github.com/mattmarcello/bs-music-theory",
+  "repository": "https://github.com/mattmarcello/bs-music-theory",
+  "bugs": "https://github.com/mattmarcello/bs-music-theory/issues"
 }
