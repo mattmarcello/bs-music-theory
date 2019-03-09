@@ -73,9 +73,6 @@ let chords =
   let harmonics: list(Chord.t) =
     scale->Scale.harmonicField(~for_=harmonicField, ~inversion, ());
 
-  Js.log2("harmonics", harmonics -> Belt.List.map(Chord.description) -> Belt.List.toArray )
-
-
   indices->Belt.List.reduce([], (acc, index) =>
     if (index < harmonics->Belt.List.size) {
       Belt.List.concat(acc, [harmonics->Belt.List.getExn(index)]);
@@ -84,7 +81,6 @@ let chords =
     }
   );
 };
-
 
 let description = (t: t) =>
   if (t == allNodes) {
@@ -96,8 +92,6 @@ let description = (t: t) =>
     |> Js.Array.joinWith("-");
   };
 
-
 let equals = (t', t'') => {
-
-	t'.nodes == t''.nodes
-}
+  t'.nodes == t''.nodes;
+};

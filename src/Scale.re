@@ -74,8 +74,8 @@ let harmonicField =
           scalePitches->Belt.List.getExn(i + 12),
         ]
       };
-    let root = chordPitches->Belt.List.headExn /*   chordPitches->Belt.List.toArray->Belt.Array.map(Pitch.description), */ /*   "chord pitches", */ /* Js.log2( */;
-    /* ); */ let intervals =
+    let root = chordPitches->Belt.List.headExn
+	    let intervals =
                chordPitches->Belt.List.map(pitch =>
                  pitch->Pitch.subtractPitch(root)
                );

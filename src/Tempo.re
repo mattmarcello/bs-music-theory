@@ -5,8 +5,6 @@ let make = (~timeSignature=TimeSignature.make(), ~bpm=120.,()) => {
   bpm,
 };
 
-//TODO: make sure consistent convention look at call site
-
 let duration = (tempo, ~of_ as noteValue: NoteValue.t, ()) => {
   let secondsPerBeat = 60.0 /. tempo.bpm;
   secondsPerBeat

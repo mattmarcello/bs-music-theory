@@ -16,18 +16,7 @@ let makeWithString = str => {
   ->Belt.Array.reduce(0, (acc, curr) =>
       switch (curr) {
       | "#" => acc + 1
-
-      /*
-       TODO:
-               Can't pattern match on unicode
-
-            | {"♯"} => acc + 1 */
       | "b" => acc - 1
-
-      /*
-
-              | "♭" => acc - 1
-       */
       | _ => acc
       }
     )

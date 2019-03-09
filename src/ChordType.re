@@ -54,13 +54,13 @@ module ChordFifthType = {
   let notation =
     fun
     | Perfect => ""
-    | Augmented => "♯5" //TODO: confirm this is oka
-    | Diminished => "♭5";
+    | Augmented => "#5" 
+    | Diminished => "b5";
 
   let description =
     fun
     | Perfect => "Perfect"
-    | Augmented => "Augmented" //TODO: confirm this is oka
+    | Augmented => "Augmented" 
     | Diminished => "Diminished";
 
   let all = [Perfect, Diminished, Augmented];
@@ -116,13 +116,13 @@ module ChordSeventhType = {
   let notation =
     fun
     | Major => "maj7"
-    | Dominant => "7" //TODO: confirm this is oka
+    | Dominant => "7"
     | Diminished => "dim7";
 
   let description =
     fun
     | Major => "Major 7th"
-    | Dominant => "Dominant 7th" //TODO: confirm this is oka
+    | Dominant => "Dominant 7th"
     | Diminished => "Diminished 7th";
 
   let all = [Major, Dominant, Diminished];
@@ -198,19 +198,12 @@ module ChordExtensionType = {
       isAdded: bool,
     };
 
-  //TODO: consider renaming this
   let make =
       (~type_: Model.ExtensionType.t, ~accidental=Accidental.Natural, ()) => {
     type_,
     accidental,
     isAdded: false //TODO: remove isAdded,
   };
-
-  // TODO: move and hide behind rei file addAcccidental defined originally defined in Chord.swift as an extension
-
-  /* let addAccidental = (interval: t, accidental: Accidental.t) => { */
-  /*   interval.semitones + accidental->Accidental.rawValue; */
-  /* }; */
 
   let makeWithInterval = (interval: Interval.t) => {
     switch (interval.semitones) {
@@ -287,7 +280,6 @@ module ChordExtensionType = {
     );
 };
 
-/* TODO: Math operators on Chord type */
 
 type t =
   Model.ChordType.t = {
